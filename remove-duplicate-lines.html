@@ -1,74 +1,437 @@
-  
-  
-  <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Remove Duplicate Lines Tool</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --primary: #3b82f6;
+      --primary-light: #93c5fd;
+      --primary-dark: #1d4ed8;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 2rem;
+      color: var(--dark);
     }
-
-    h2 {
-      color: #007bff;
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      color: var(--primary-dark);
       text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
     }
-
-    #textBox {
-      width: 90%;
-      max-width: 500px;
-      min-height: 150px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-      margin-bottom: 15px;
-      outline: none;
-      overflow-y: auto;
+    
+    .description {
+      color: var(--gray);
+      text-align: center;
+      margin-bottom: 2rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    
+    .tool-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .text-areas {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .text-area-container {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .text-area-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .text-area {
+      width: 100%;
+      min-height: 300px;
+      padding: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      resize: vertical;
+      background: white;
+      transition: all 0.2s ease;
+      line-height: 1.5;
       white-space: pre-wrap;
     }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 8px;
-      cursor: pointer;
-      margin-bottom: 15px;
+    
+    .text-area:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
     }
-
-    button:hover {
-      background-color: #0056b3;
+    
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+    }
+    
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--dark);
+    }
+    
+    .btn-secondary:hover {
+      background: #cbd5e1;
+      transform: translateY(-2px);
+    }
+    
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      justify-content: center;
+    }
+    
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .stat {
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 1rem 1.5rem;
+      background: var(--success);
+      color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .text-areas {
+        flex-direction: column;
+      }
+      
+      .text-area-container {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h2>Remove Duplicate Lines</h2>
-
-  <div id="textBox" contenteditable="true" placeholder="Paste or type lines here..."></div>
-
-  <button onclick="removeDuplicates()">Remove Duplicates</button>
-
+  <div class="container">
+    <h1>Remove Duplicate Lines</h1>
+    <p class="description">Clean and optimize your text by removing duplicate lines. Compare input and output side by side with detailed statistics.</p>
+    
+    <div class="tool-container">
+      <div class="options">
+        <div class="option-group">
+          <input type="checkbox" id="trimLines" checked>
+          <label for="trimLines">Trim whitespace</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="ignoreCase">
+          <label for="ignoreCase">Ignore case</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="ignoreEmpty">
+          <label for="ignoreEmpty">Ignore empty lines</label>
+        </div>
+        <div class="option-group">
+          <input type="checkbox" id="preserveOrder" checked>
+          <label for="preserveOrder">Preserve original order</label>
+        </div>
+      </div>
+      
+      <div class="text-areas">
+        <div class="text-area-container">
+          <label for="inputText" class="text-area-label">Input Text</label>
+          <textarea id="inputText" class="text-area" placeholder="Paste your text with duplicate lines here..."></textarea>
+        </div>
+        <div class="text-area-container">
+          <label for="outputText" class="text-area-label">Unique Lines</label>
+          <textarea id="outputText" class="text-area" placeholder="Results will appear here..." readonly></textarea>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn btn-primary" onclick="removeDuplicates()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0V6z"/>
+            <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+          </svg>
+          Remove Duplicates
+        </button>
+        <button class="btn btn-secondary" onclick="copyToClipboard()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+            <path fill-rule="evenodd" d="M10 1.5a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-1Zm-5 0A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5v1A1.5 1.5 0 0 1 9.5 4h-3A1.5 1.5 0 0 1 5 2.5v-1Zm-2 0h1v1A2.5 2.5 0 0 0 6.5 5h3A2.5 2.5 0 0 0 12 2.5v-1h1a2 2 0 0 1 2 2V14a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V3.5a2 2 0 0 1 2-2Z"/>
+          </svg>
+          Copy Results
+        </button>
+        <button class="btn btn-secondary" onclick="clearAll()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+            <path d="M5.5 5.5A.5.5 0 0 1 6 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm2.5 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5Zm3 .5a.5.5 0 0 0-1 0v4a.5.5 0 0 0 1 0V6Z"/>
+            <path d="M14.5 3a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H13v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V3H1.5a1 1 0 0 1 1-1h1a1 1 0 0 1 1 1H14a1 1 0 0 1 1 1h1a1 1 0 0 1 1 1ZM2 3v13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V3H2Z"/>
+          </svg>
+          Clear All
+        </button>
+      </div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="inputLines">0</div>
+          <div class="stat-label">Input Lines</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="outputLines">0</div>
+          <div class="stat-label">Unique Lines</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="duplicates">0</div>
+          <div class="stat-label">Duplicates Removed</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="reduction">0%</div>
+          <div class="stat-label">Reduction</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="notification" class="notification">Copied to clipboard!</div>
+  
   <script>
-    function removeDuplicates() {
-      var content = document.getElementById("textBox").innerText;
-      var lines = content.split('\n');
-      var uniqueLines = [...new Set(lines.map(line => line.trim()))].filter(line => line !== "");
-      document.getElementById("textBox").innerText = uniqueLines.join('\n');
+    // Update line counts when input changes
+    document.getElementById('inputText').addEventListener('input', function() {
+      updateLineCounts();
+    });
+    
+    function updateLineCounts() {
+      const inputText = document.getElementById('inputText').value;
+      const outputText = document.getElementById('outputText').value;
+      
+      const inputLines = inputText ? inputText.split('\n').length : 0;
+      const outputLines = outputText ? outputText.split('\n').length : 0;
+      
+      document.getElementById('inputLines').textContent = inputLines;
+      document.getElementById('outputLines').textContent = outputLines;
+      
+      if (inputLines > 0 && outputLines > 0) {
+        const duplicates = inputLines - outputLines;
+        const reduction = Math.round((duplicates / inputLines) * 100);
+        
+        document.getElementById('duplicates').textContent = duplicates;
+        document.getElementById('reduction').textContent = reduction + '%';
+      } else {
+        document.getElementById('duplicates').textContent = '0';
+        document.getElementById('reduction').textContent = '0%';
+      }
     }
+    
+    function removeDuplicates() {
+      const inputText = document.getElementById('inputText').value;
+      if (!inputText.trim()) {
+        showNotification('Please enter some text first', 'error');
+        return;
+      }
+      
+      const trimLines = document.getElementById('trimLines').checked;
+      const ignoreCase = document.getElementById('ignoreCase').checked;
+      const ignoreEmpty = document.getElementById('ignoreEmpty').checked;
+      const preserveOrder = document.getElementById('preserveOrder').checked;
+      
+      let lines = inputText.split('\n');
+      
+      // Process lines based on options
+      if (trimLines) {
+        lines = lines.map(line => line.trim());
+      }
+      
+      if (ignoreEmpty) {
+        lines = lines.filter(line => line !== '');
+      }
+      
+      // Remove duplicates
+      let uniqueLines;
+      if (preserveOrder) {
+        uniqueLines = [];
+        const seen = new Set();
+        
+        for (const line of lines) {
+          const key = ignoreCase ? line.toLowerCase() : line;
+          if (!seen.has(key)) {
+            seen.add(key);
+            uniqueLines.push(line);
+          }
+        }
+      } else {
+        if (ignoreCase) {
+          uniqueLines = [...new Set(lines.map(line => line.toLowerCase()))];
+          // Restore original case from first occurrence
+          const caseMap = new Map();
+          lines.forEach(line => {
+            const lower = line.toLowerCase();
+            if (!caseMap.has(lower)) {
+              caseMap.set(lower, line);
+            }
+          });
+          uniqueLines = uniqueLines.map(line => caseMap.get(line));
+        } else {
+          uniqueLines = [...new Set(lines)];
+        }
+      }
+      
+      document.getElementById('outputText').value = uniqueLines.join('\n');
+      updateLineCounts();
+      showNotification('Duplicates removed successfully!', 'success');
+    }
+    
+    function copyToClipboard() {
+      const outputText = document.getElementById('outputText');
+      if (!outputText.value.trim()) {
+        showNotification('No results to copy', 'error');
+        return;
+      }
+      
+      outputText.select();
+      document.execCommand('copy');
+      
+      // Show notification
+      showNotification('Copied to clipboard!', 'success');
+    }
+    
+    function clearAll() {
+      document.getElementById('inputText').value = '';
+      document.getElementById('outputText').value = '';
+      updateLineCounts();
+      showNotification('Cleared all text', 'success');
+    }
+    
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      
+      // Set color based on type
+      if (type === 'error') {
+        notification.style.background = 'var(--error)';
+      } else {
+        notification.style.background = 'var(--success)';
+      }
+      
+      notification.classList.add('show');
+      
+      // Hide after 3 seconds
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Initialize line counts
+    updateLineCounts();
   </script>
-
 </body>
 </html>
-
-  
-  
