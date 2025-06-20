@@ -1,111 +1,586 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>JSON Formatter & Validator Tool</title>
+  <title>JSON-Formatter-Validator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #7c3aed;
+      --primary-light: #8b5cf6;
+      --primary-dark: #6d28d9;
+      --secondary: #10b981;
+      --dark: #1e293b;
+      --light: #f8fafc;
+      --gray: #64748b;
+      --error: #ef4444;
+      --warning: #f59e0b;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
-      padding: 20px;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 2rem;
+      color: var(--dark);
     }
-
-    h2 {
-      color: #007bff;
+    
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      background: white;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+    
+    h1 {
+      color: var(--primary-dark);
       text-align: center;
+      margin-bottom: 1rem;
+      font-weight: 600;
     }
-
-    #textBox {
-      width: 90%;
+    
+    .description {
+      color: var(--gray);
+      text-align: center;
+      margin-bottom: 2rem;
       max-width: 600px;
-      min-height: 150px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-      margin-bottom: 15px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.5;
+    }
+    
+    .tool-container {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .code-areas {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    
+    .code-area-container {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .code-area-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    .code-area {
+      width: 100%;
+      min-height: 300px;
+      padding: 1rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 0.5rem;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+      background: white;
+      transition: all 0.2s ease;
+      line-height: 1.5;
+      tab-size: 2;
+    }
+    
+    .code-area:focus {
       outline: none;
-      overflow-y: auto;
-      white-space: pre-wrap;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
     }
-
-    button {
-      padding: 10px 20px;
-      font-size: 16px;
+    
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1rem;
+      justify-content: center;
+    }
+    
+    .option-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn {
+      padding: 0.75rem 1.5rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
       border: none;
-      background-color: #007bff;
-      color: white;
-      border-radius: 8px;
+      border-radius: 0.5rem;
       cursor: pointer;
-      margin-bottom: 15px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
-
-    button:hover {
-      background-color: #0056b3;
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
     }
-
-    #output {
-      font-size: 16px;
-      margin-top: 20px;
-      color: #333;
+    
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(124, 58, 237, 0.3);
+    }
+    
+    .btn-secondary {
+      background: #e2e8f0;
+      color: var(--dark);
+    }
+    
+    .btn-secondary:hover {
+      background: #cbd5e1;
+      transform: translateY(-2px);
+    }
+    
+    .btn-success {
+      background: var(--secondary);
+      color: white;
+    }
+    
+    .btn-success:hover {
+      background: #0d9b6c;
+      transform: translateY(-2px);
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      padding: 1rem 1.5rem;
+      background: var(--secondary);
+      color: white;
+      border-radius: 0.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+      z-index: 100;
+    }
+    
+    .notification.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+    
+    .notification.error {
+      background: var(--error);
+    }
+    
+    .notification.warning {
+      background: var(--warning);
+    }
+    
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+      margin-top: 1.5rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #e2e8f0;
+    }
+    
+    .stat {
+      text-align: center;
+      min-width: 120px;
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--gray);
+    }
+    
+    .error-message {
+      padding: 1rem;
+      border-radius: 0.5rem;
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--error);
+      font-family: 'Consolas', 'Monaco', monospace;
       white-space: pre-wrap;
     }
-
-    #error {
-      color: red;
-      font-weight: bold;
+    
+    .error-line {
+      background: rgba(239, 68, 68, 0.2);
+    }
+    
+    .json-key {
+      color: #7c3aed;
+    }
+    
+    .json-string {
+      color: #10b981;
+    }
+    
+    .json-number {
+      color: #3b82f6;
+    }
+    
+    .json-boolean {
+      color: #f59e0b;
+    }
+    
+    .json-null {
+      color: #64748b;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .code-areas {
+        flex-direction: column;
+      }
+      
+      .code-area-container {
+        min-width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h2>JSON Formatter & Validator Tool</h2>
-
-  <div id="textBox" contenteditable="true" placeholder="Paste your JSON code here..."></div>
-
-  <button onclick="formatAndValidateJSON()">Format & Validate JSON</button>
-
-  <div id="error"></div>
-  <div id="output"></div>
-
+  <div class="container">
+    <h1>JSON-Formatter-Validator</h1>
+    <p class="description">Validate, format, and analyze your JSON data with syntax highlighting and detailed error reporting</p>
+    
+    <div class="tool-container">
+      <div class="code-areas">
+        <div class="code-area-container">
+          <label for="inputJson" class="code-area-label">Input JSON</label>
+          <textarea id="inputJson" class="code-area" placeholder="Paste your JSON here..."></textarea>
+        </div>
+        <div class="code-area-container">
+          <label for="outputJson" class="code-area-label">Formatted JSON</label>
+          <textarea id="outputJson" class="code-area" placeholder="Formatted JSON will appear here..." readonly></textarea>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <button class="btn btn-primary" onclick="formatAndValidate()">
+          <i class="fas fa-check-circle"></i> Validate & Format
+        </button>
+        <button class="btn btn-secondary" onclick="minifyJson()">
+          <i class="fas fa-compress-alt"></i> Minify
+        </button>
+        <button class="btn btn-success" onclick="copyToClipboard()">
+          <i class="fas fa-copy"></i> Copy
+        </button>
+        <button class="btn btn-secondary" onclick="clearAll()">
+          <i class="fas fa-trash-alt"></i> Clear
+        </button>
+        <button class="btn btn-secondary" onclick="loadSample()">
+          <i class="fas fa-lightbulb"></i> Sample
+        </button>
+      </div>
+      
+      <div id="errorContainer" class="error-message" style="display: none;"></div>
+      
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-value" id="inputSize">0</div>
+          <div class="stat-label">Input Bytes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="outputSize">0</div>
+          <div class="stat-label">Output Bytes</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="processingTime">0ms</div>
+          <div class="stat-label">Processing Time</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="depth">0</div>
+          <div class="stat-label">Max Depth</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div id="notification" class="notification">Copied to clipboard!</div>
+  
   <script>
-    function formatAndValidateJSON() {
-      const content = document.getElementById("textBox").innerText.trim();
-      const errorElement = document.getElementById("error");
-      const outputElement = document.getElementById("output");
-
-      errorElement.innerText = ''; // Reset error message
-      outputElement.innerText = ''; // Reset output message
-
-      if (!content) {
-        errorElement.innerText = "Please paste valid JSON data.";
+    // Update stats when input changes
+    document.getElementById('inputJson').addEventListener('input', function() {
+      updateStats();
+    });
+    
+    function formatAndValidate() {
+      const startTime = performance.now();
+      const inputJson = document.getElementById('inputJson').value.trim();
+      const errorContainer = document.getElementById('errorContainer');
+      const outputJson = document.getElementById('outputJson');
+      
+      errorContainer.style.display = 'none';
+      outputJson.value = '';
+      
+      if (!inputJson) {
+        showError('Please enter some JSON to validate');
         return;
       }
-
+      
       try {
-        // Try to parse the JSON content
-        const jsonObject = JSON.parse(content);
-
-        // If parsing succeeds, format the JSON with 2 spaces
-        const formattedJSON = JSON.stringify(jsonObject, null, 2);
-
-        // Display formatted JSON
-        outputElement.innerText = "Formatted JSON:\n" + formattedJSON;
-
-      } catch (e) {
-        // If parsing fails, display error message
-        errorElement.innerText = "Invalid JSON: " + e.message;
+        const jsonObj = JSON.parse(inputJson);
+        const formattedJson = JSON.stringify(jsonObj, null, 2);
+        
+        outputJson.value = formattedJson;
+        applySyntaxHighlighting();
+        
+        // Calculate JSON depth
+        const jsonDepth = calculateDepth(jsonObj);
+        document.getElementById('depth').textContent = jsonDepth;
+        
+        const endTime = performance.now();
+        document.getElementById('processingTime').textContent = `${Math.round(endTime - startTime)}ms`;
+        
+        updateStats();
+        showNotification('JSON is valid and formatted!', 'success');
+      } catch (error) {
+        showError(error.message);
+        highlightErrorPosition(error, inputJson);
       }
     }
+    
+    function minifyJson() {
+      const inputJson = document.getElementById('inputJson').value.trim();
+      const errorContainer = document.getElementById('errorContainer');
+      
+      errorContainer.style.display = 'none';
+      
+      if (!inputJson) {
+        showError('Please enter some JSON to minify');
+        return;
+      }
+      
+      try {
+        const jsonObj = JSON.parse(inputJson);
+        const minifiedJson = JSON.stringify(jsonObj);
+        
+        document.getElementById('outputJson').value = minifiedJson;
+        updateStats();
+        showNotification('JSON minified successfully!', 'success');
+      } catch (error) {
+        showError(error.message);
+      }
+    }
+    
+    function applySyntaxHighlighting() {
+      const outputJson = document.getElementById('outputJson');
+      const jsonValue = outputJson.value;
+      
+      // This is a simple syntax highlighter - in a real app you might want a more robust solution
+      let highlighted = jsonValue
+        .replace(/"([^"]+)":/g, '<span class="json-key">"$1"</span>:')
+        .replace(/"([^"]+)"/g, '<span class="json-string">"$1"</span>')
+        .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
+        .replace(/\b(null)\b/g, '<span class="json-null">$1</span>')
+        .replace(/\b(\d+\.?\d*)\b/g, '<span class="json-number">$1</span>');
+      
+      // Create a temporary div to hold our HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = highlighted;
+      
+      // Replace the textarea with a div that shows our highlighted code
+      outputJson.style.display = 'none';
+      
+      const highlightDiv = document.createElement('div');
+      highlightDiv.className = 'code-area';
+      highlightDiv.style.backgroundColor = 'white';
+      highlightDiv.style.whiteSpace = 'pre-wrap';
+      highlightDiv.innerHTML = highlighted;
+      
+      // Insert after the textarea
+      outputJson.parentNode.insertBefore(highlightDiv, outputJson.nextSibling);
+      
+      // Add click handler to switch back to textarea
+      highlightDiv.addEventListener('dblclick', function() {
+        highlightDiv.style.display = 'none';
+        outputJson.style.display = 'block';
+        outputJson.focus();
+      });
+    }
+    
+    function calculateDepth(obj) {
+      let depth = 0;
+      
+      if (typeof obj === 'object' && obj !== null) {
+        for (let key in obj) {
+          if (obj.hasOwnProperty(key)) {
+            const currentDepth = calculateDepth(obj[key]);
+            if (currentDepth > depth) {
+              depth = currentDepth;
+            }
+          }
+        }
+        depth++;
+      }
+      
+      return depth;
+    }
+    
+    function highlightErrorPosition(error, jsonString) {
+      const errorContainer = document.getElementById('errorContainer');
+      errorContainer.style.display = 'block';
+      errorContainer.innerHTML = error.message;
+      
+      // Try to extract position from error message
+      const positionMatch = error.message.match(/position\s+(\d+)/);
+      if (positionMatch) {
+        const errorPosition = parseInt(positionMatch[1]);
+        const lines = jsonString.split('\n');
+        let currentPosition = 0;
+        let errorLine = 0;
+        let column = 0;
+        
+        for (let i = 0; i < lines.length; i++) {
+          if (currentPosition + lines[i].length >= errorPosition) {
+            errorLine = i;
+            column = errorPosition - currentPosition;
+            break;
+          }
+          currentPosition += lines[i].length + 1; // +1 for newline character
+        }
+        
+        // Show context around the error
+        const start = Math.max(0, errorLine - 2);
+        const end = Math.min(lines.length, errorLine + 3);
+        
+        let errorContext = '';
+        for (let i = start; i < end; i++) {
+          if (i === errorLine) {
+            errorContext += `<div class="error-line">${escapeHtml(lines[i])}\n`;
+            errorContext += ' '.repeat(column) + '^-- Error here</div>';
+          } else {
+            errorContext += escapeHtml(lines[i]) + '\n';
+          }
+        }
+        
+        errorContainer.innerHTML += '\n\nError at:\n' + errorContext;
+      }
+    }
+    
+    function escapeHtml(unsafe) {
+      return unsafe
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+    
+    function showError(message) {
+      const errorContainer = document.getElementById('errorContainer');
+      errorContainer.style.display = 'block';
+      errorContainer.textContent = message;
+      showNotification('Invalid JSON detected', 'error');
+    }
+    
+    function copyToClipboard() {
+      const outputJson = document.getElementById('outputJson');
+      if (!outputJson.value.trim()) {
+        showNotification('No JSON to copy', 'error');
+        return;
+      }
+      
+      outputJson.select();
+      document.execCommand('copy');
+      
+      showNotification('Copied to clipboard!', 'success');
+    }
+    
+    function clearAll() {
+      document.getElementById('inputJson').value = '';
+      document.getElementById('outputJson').value = '';
+      document.getElementById('errorContainer').style.display = 'none';
+      document.getElementById('inputSize').textContent = '0';
+      document.getElementById('outputSize').textContent = '0';
+      document.getElementById('processingTime').textContent = '0ms';
+      document.getElementById('depth').textContent = '0';
+      showNotification('Cleared all content', 'success');
+    }
+    
+    function loadSample() {
+      const sampleJson = `{
+  "name": "Advanced JSON Tool",
+  "version": "1.0.0",
+  "description": "A powerful JSON formatter and validator",
+  "features": [
+    "Syntax highlighting",
+    "Error detection",
+    "Minification",
+    "Depth analysis"
+  ],
+  "stats": {
+    "bytes": 1024,
+    "lines": 42,
+    "complexity": "medium"
+  },
+  "active": true,
+  "nullable": null
+}`;
+      
+      document.getElementById('inputJson').value = sampleJson;
+      showNotification('Loaded sample JSON', 'success');
+    }
+    
+    function updateStats() {
+      const inputJson = document.getElementById('inputJson').value;
+      const outputJson = document.getElementById('outputJson').value;
+      
+      document.getElementById('inputSize').textContent = inputJson.length;
+      document.getElementById('outputSize').textContent = outputJson.length || '0';
+    }
+    
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification ${type}`;
+      notification.classList.add('show');
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Initialize
+    updateStats();
   </script>
-
 </body>
 </html>
-
-  
