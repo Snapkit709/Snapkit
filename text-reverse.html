@@ -1,83 +1,603 @@
-  
-  <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Text Reversal Tool</title>
   <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       padding: 20px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      color: var(--dark-color);
     }
 
-    h2 {
-      color: #007bff;
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin: 20px 0;
+    }
+
+    h1 {
+      color: var(--primary-color);
       text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .input-section, .output-section {
+      margin-bottom: 25px;
     }
 
     #textBox {
-      width: 90%;
-      max-width: 500px;
+      width: 100%;
       min-height: 150px;
-      padding: 10px;
+      padding: 15px;
       font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+      background: var(--light-color);
+      margin-bottom: 20px;
       outline: none;
-      overflow-y: auto;
-      white-space: pre-wrap;
+      resize: vertical;
+      transition: border 0.3s ease;
+    }
+
+    #textBox:focus {
+      border-color: var(--primary-color);
+    }
+
+    #textBox::placeholder {
+      color: #adb5bd;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+    }
+
+    label {
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark-color);
+    }
+
+    select, input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      font-size: 16px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       border: none;
-      background-color: #007bff;
+      background: var(--primary-color);
       color: white;
       border-radius: 8px;
       cursor: pointer;
-      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background: var(--secondary-color);
+      transform: translateY(-2px);
     }
 
-    #output {
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: #6c757d;
+    }
+
+    button.secondary:hover {
+      background: #5a6268;
+    }
+
+    button.success {
+      background: var(--success-color);
+    }
+
+    button.success:hover {
+      background: #3aa33a;
+    }
+
+    button.warning {
+      background: var(--warning-color);
+      color: var(--dark-color);
+    }
+
+    button.warning:hover {
+      background: #e0a800;
+    }
+
+    button.danger {
+      background: var(--danger-color);
+    }
+
+    button.danger:hover {
+      background: #c82333;
+    }
+
+    #outputText {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
       font-size: 16px;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+      background: #f8f9fa;
+      margin-top: 10px;
+      resize: vertical;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
       margin-top: 20px;
-      color: #333;
+      padding: 15px;
+      background: #f1f3f5;
+      border-radius: 10px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-group input {
+      width: 18px;
+      height: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .controls {
+        flex-direction: column;
+      }
+      
+      .control-group {
+        width: 100%;
+      }
+      
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h2>Text Reversal Tool</h2>
-
-  <div id="textBox" contenteditable="true" placeholder="Paste or type text here..."></div>
-
-  <button onclick="reverseText()">Reverse Text</button>
-
-  <div id="output"></div>
+  <div class="container">
+    <h1>Text Reversal</h1>
+    
+    <div class="input-section">
+      <div id="textBox" contenteditable="true" placeholder="Paste or type your text here..."></div>
+      
+      <div class="controls">
+        <div class="control-group">
+          <label for="transformType">Transformation Type</label>
+          <select id="transformType">
+            <option value="reverse">Reverse Text</option>
+            <option value="reverseWords">Reverse Word Order</option>
+            <option value="reverseSentences">Reverse Sentence Order</option>
+            <option value="uppercase">UPPERCASE</option>
+            <option value="lowercase">lowercase</option>
+            <option value="titleCase">Title Case</option>
+            <option value="sentenceCase">Sentence case</option>
+            <option value="alternating">aLtErNaTiNg cAsE</option>
+            <option value="inverseCase">InVeRsE CaSe</option>
+            <option value="rot13">ROT13 Cipher</option>
+            <option value="binary">Binary Code</option>
+            <option value="morse">Morse Code</option>
+            <option value="spongebob">SpOnGeBoB MeMe</option>
+          </select>
+        </div>
+        
+        <div class="checkbox-group">
+          <input type="checkbox" id="preserveFormatting">
+          <label for="preserveFormatting">Preserve line breaks and paragraphs</label>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="transformText()" class="tooltip">
+          <span class="tooltiptext">Apply selected transformation to the text</span>
+          Transform Text
+        </button>
+        <button onclick="copyOriginal()" class="secondary tooltip">
+          <span class="tooltiptext">Copy original text to clipboard</span>
+          Copy Original
+        </button>
+        <button onclick="copyResult()" class="success tooltip">
+          <span class="tooltiptext">Copy transformed text to clipboard</span>
+          Copy Result
+        </button>
+        <button onclick="clearAll()" class="danger tooltip">
+          <span class="tooltiptext">Clear all text</span>
+          Clear All
+        </button>
+      </div>
+    </div>
+    
+    <div class="output-section">
+      <label for="outputText">Transformed Text:</label>
+      <div id="outputText" contenteditable="true"></div>
+      
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Original Length</span>
+          <span class="stat-value" id="originalLength">0 chars</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Transformed Length</span>
+          <span class="stat-value" id="transformedLength">0 chars</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Processing Time</span>
+          <span class="stat-value" id="processingTime">0 ms</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    function reverseText() {
-      var content = document.getElementById("textBox").innerText.trim();
+    // DOM elements
+    const textBox = document.getElementById('textBox');
+    const outputText = document.getElementById('outputText');
+    const transformType = document.getElementById('transformType');
+    const preserveFormatting = document.getElementById('preserveFormatting');
+    const originalLengthEl = document.getElementById('originalLength');
+    const transformedLengthEl = document.getElementById('transformedLength');
+    const processingTimeEl = document.getElementById('processingTime');
+    
+    // Morse code dictionary
+    const morseCode = {
+      'A': '.-', 'B': '-...', 'C': '-.-.', 'D': '-..', 'E': '.', 
+      'F': '..-.', 'G': '--.', 'H': '....', 'I': '..', 'J': '.---', 
+      'K': '-.-', 'L': '.-..', 'M': '--', 'N': '-.', 'O': '---', 
+      'P': '.--.', 'Q': '--.-', 'R': '.-.', 'S': '...', 'T': '-', 
+      'U': '..-', 'V': '...-', 'W': '.--', 'X': '-..-', 'Y': '-.--', 
+      'Z': '--..', '0': '-----', '1': '.----', '2': '..---', '3': '...--', 
+      '4': '....-', '5': '.....', '6': '-....', '7': '--...', '8': '---..', 
+      '9': '----.', '.': '.-.-.-', ',': '--..--', '?': '..--..', "'": '.----.', 
+      '!': '-.-.--', '/': '-..-.', '(': '-.--.', ')': '-.--.-', '&': '.-...', 
+      ':': '---...', ';': '-.-.-.', '=': '-...-', '+': '.-.-.', '-': '-....-', 
+      '_': '..--.-', '"': '.-..-.', '$': '...-..-', '@': '.--.-.', ' ': '/'
+    };
+    
+    // Initialize with empty text
+    updateStats();
+    
+    // Update stats when text changes
+    textBox.addEventListener('input', updateStats);
+    outputText.addEventListener('input', updateStats);
+    
+    function updateStats() {
+      const originalText = textBox.innerText;
+      const transformedText = outputText.innerText;
       
-      // Reverse the input text
-      var reversedText = content.split('').reverse().join('');
+      originalLengthEl.textContent = `${originalText.length} chars`;
+      transformedLengthEl.textContent = `${transformedText.length} chars`;
+    }
+    
+    function transformText() {
+      const startTime = performance.now();
+      const content = textBox.innerText;
+      const type = transformType.value;
+      const preserve = preserveFormatting.checked;
       
-      document.getElementById("output").innerText = "Reversed Text: " + reversedText;
+      if (!content.trim()) {
+        outputText.innerText = "Please enter some text first!";
+        return;
+      }
+      
+      let transformed;
+      
+      switch(type) {
+        case 'reverse':
+          transformed = reverseString(content, preserve);
+          break;
+        case 'reverseWords':
+          transformed = reverseWords(content, preserve);
+          break;
+        case 'reverseSentences':
+          transformed = reverseSentences(content, preserve);
+          break;
+        case 'uppercase':
+          transformed = content.toUpperCase();
+          break;
+        case 'lowercase':
+          transformed = content.toLowerCase();
+          break;
+        case 'titleCase':
+          transformed = toTitleCase(content);
+          break;
+        case 'sentenceCase':
+          transformed = toSentenceCase(content);
+          break;
+        case 'alternating':
+          transformed = toAlternatingCase(content);
+          break;
+        case 'inverseCase':
+          transformed = toInverseCase(content);
+          break;
+        case 'rot13':
+          transformed = rot13(content);
+          break;
+        case 'binary':
+          transformed = toBinary(content);
+          break;
+        case 'morse':
+          transformed = toMorseCode(content);
+          break;
+        case 'spongebob':
+          transformed = toSpongebobCase(content);
+          break;
+        default:
+          transformed = content;
+      }
+      
+      outputText.innerText = transformed;
+      
+      const endTime = performance.now();
+      processingTimeEl.textContent = `${Math.round(endTime - startTime)} ms`;
+      updateStats();
+    }
+    
+    function reverseString(str, preserveFormatting) {
+      if (preserveFormatting) {
+        return str.split('\n').map(line => line.split('').reverse().join('')).join('\n');
+      }
+      return str.split('').reverse().join('');
+    }
+    
+    function reverseWords(str, preserveFormatting) {
+      if (preserveFormatting) {
+        return str.split('\n').map(line => line.split(/\s+/).reverse().join(' ')).join('\n');
+      }
+      return str.split(/\s+/).reverse().join(' ');
+    }
+    
+    function reverseSentences(str, preserveFormatting) {
+      const sentences = str.split(/([.!?]+)/);
+      let result = [];
+      let sentenceGroup = [];
+      
+      for (let i = 0; i < sentences.length; i++) {
+        if (i % 2 === 0) {
+          // Sentence content
+          sentenceGroup[0] = sentences[i];
+        } else {
+          // Punctuation
+          sentenceGroup[1] = sentences[i];
+          result.unshift(sentenceGroup.join(''));
+          sentenceGroup = [];
+        }
+      }
+      
+      if (sentenceGroup.length > 0) {
+        result.unshift(sentenceGroup.join(''));
+      }
+      
+      if (preserveFormatting) {
+        return result.join('').split('\n').map(para => 
+          para.split(/([.!?]+)/).filter(Boolean).reverse().join('')
+        ).join('\n');
+      }
+      
+      return result.join('');
+    }
+    
+    function toTitleCase(str) {
+      return str.replace(/\w\S*/g, function(txt) {
+        return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+      });
+    }
+    
+    function toSentenceCase(str) {
+      return str.toLowerCase().replace(/(^\s*\w|[.!?]\s*\w)/g, function(c) {
+        return c.toUpperCase();
+      });
+    }
+    
+    function toAlternatingCase(str) {
+      let result = '';
+      let upper = false;
+      
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        if (/[a-zA-Z]/.test(char)) {
+          result += upper ? char.toUpperCase() : char.toLowerCase();
+          upper = !upper;
+        } else {
+          result += char;
+        }
+      }
+      
+      return result;
+    }
+    
+    function toInverseCase(str) {
+      return str.split('').map(char => {
+        if (char === char.toUpperCase()) {
+          return char.toLowerCase();
+        } else {
+          return char.toUpperCase();
+        }
+      }).join('');
+    }
+    
+    function rot13(str) {
+      return str.replace(/[a-zA-Z]/g, function(c) {
+        return String.fromCharCode((c <= "Z" ? 90 : 122) >= (c = c.charCodeAt(0) + 13) ? c : c - 26);
+      });
+    }
+    
+    function toBinary(str) {
+      return str.split('').map(char => {
+        return char.charCodeAt(0).toString(2).padStart(8, '0');
+      }).join(' ');
+    }
+    
+    function toMorseCode(str) {
+      return str.toUpperCase().split('').map(char => {
+        return morseCode[char] || char;
+      }).join(' ');
+    }
+    
+    function toSpongebobCase(str) {
+      let result = '';
+      let lastWasUpper = false;
+      
+      for (let i = 0; i < str.length; i++) {
+        const char = str[i];
+        if (/[a-zA-Z]/.test(char)) {
+          // Randomly decide to make this character uppercase or lowercase
+          // But avoid having 3 of the same case in a row
+          const makeUpper = Math.random() > 0.5;
+          
+          if (makeUpper) {
+            result += char.toUpperCase();
+            lastWasUpper = true;
+          } else {
+            result += char.toLowerCase();
+            lastWasUpper = false;
+          }
+        } else {
+          result += char;
+        }
+      }
+      
+      return result;
+    }
+    
+    function copyOriginal() {
+      copyToClipboard(textBox.innerText, 'Original text copied!');
+    }
+    
+    function copyResult() {
+      copyToClipboard(outputText.innerText, 'Transformed text copied!');
+    }
+    
+    function copyToClipboard(text, successMessage) {
+      if (!text.trim()) {
+        alert("Nothing to copy!");
+        return;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Show temporary feedback
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span>✓ ${successMessage}</span>`;
+        btn.classList.add('success');
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.classList.remove('success');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert("Failed to copy text. Please try again.");
+      });
+    }
+    
+    function clearAll() {
+      if (confirm("Are you sure you want to clear all text?")) {
+        textBox.innerText = '';
+        outputText.innerText = '';
+        updateStats();
+      }
     }
   </script>
-
 </body>
 </html>
-
-  
-  
