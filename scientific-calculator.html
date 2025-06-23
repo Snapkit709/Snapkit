@@ -1,162 +1,1010 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Scientific Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Scientific Calculator</title>
+    <meta name="description" content="Professional scientific calculator with graphing, equation solving, and unit conversion">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #3f37c9;
+            --light: #f8f9ff;
+            --dark: #212529;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --danger: #f72585;
+            --success: #28a745;
+            --warning: #ffc107;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f9;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
+            padding: 20px;
         }
 
-        .calculator {
+        .app-container {
+            width: 100%;
+            max-width: 420px;
             background-color: #fff;
+            border-radius: 15px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .app-container:hover {
+            transform: translateY(-5px);
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .app-tabs {
+            display: flex;
+            gap: 5px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-btn.active {
+            background: white;
+            color: var(--primary);
+        }
+
+        .calculator-display {
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
+            text-align: right;
+            background-color: var(--light);
+            position: relative;
+            min-height: 120px;
+        }
+
+        .menu-btn {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        #expression {
+            width: 100%;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            text-align: right;
+            color: var(--gray);
+            height: 20px;
+            margin-bottom: 5px;
         }
 
         #display {
             width: 100%;
-            height: 50px;
-            font-size: 1.5rem;
+            border: none;
+            background: transparent;
+            font-size: 2.2rem;
             text-align: right;
-            border-radius: 5px;
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #f1f1f1;
+            padding: 10px 0;
+            color: var(--dark);
+            font-weight: 500;
         }
 
-        .button {
-            width: 60px;
-            height: 60px;
-            margin: 5px;
-            font-size: 1.5rem;
-            border-radius: 5px;
-            border: 1px solid #ccc;
+        .calculator-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 15px;
+        }
+
+        .btn {
+            aspect-ratio: 1/1;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1.2rem;
+            font-weight: 500;
             cursor: pointer;
-            background-color: #f1f1f1;
-            transition: background-color 0.3s;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--light-gray);
+            color: var(--dark);
         }
 
-        .button:hover {
-            background-color: #007bff;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-number {
+            background-color: white;
+        }
+
+        .btn-operator {
+            background-color: #e3f2fd;
+            color: var(--primary);
+        }
+
+        .btn-function {
+            background-color: #e8f5e9;
+            color: var(--success);
+            font-size: 1rem;
+        }
+
+        .btn-scientific {
+            background-color: #e3f2fd;
+            color: var(--primary);
+            font-size: 0.9rem;
+        }
+
+        .btn-clear {
+            background-color: #ffebee;
+            color: var(--danger);
+        }
+
+        .btn-equals {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            grid-column: span 2;
+            aspect-ratio: unset;
+        }
+
+        .btn-double {
+            grid-column: span 2;
+            aspect-ratio: unset;
+        }
+
+        /* Panels */
+        .panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .panel.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .panel-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .close-panel {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        /* History panel */
+        .history-item {
+            padding: 10px 0;
+            border-bottom: 1px solid var(--light-gray);
+            cursor: pointer;
+        }
+
+        .history-item:hover {
+            background-color: var(--light);
+        }
+
+        .history-expression {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .history-result {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .panel-footer {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 15px;
+            background-color: var(--light-gray);
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .panel-footer:hover {
+            background-color: var(--danger);
             color: white;
         }
 
-        .button:active {
-            background-color: #0056b3;
+        /* Settings panel */
+        .settings-option {
+            margin-bottom: 15px;
         }
 
-        .button.double {
-            width: 130px;
+        .settings-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
         }
 
-        .button.clear {
-            background-color: #ff4d4d;
-            color: white;
+        .settings-select {
+            width: 100%;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light-gray);
         }
 
-        .button.equals {
-            background-color: #28a745;
-            color: white;
+        /* Graph panel */
+        .graph-container {
+            width: 100%;
+            height: 250px;
+            background-color: var(--light);
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .button.function {
-            background-color: #17a2b8;
-            color: white;
+        .graph-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .graph-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light-gray);
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .calculator-buttons {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .btn-scientific {
+                display: none;
+            }
+            
+            .app-container {
+                max-width: 100%;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 0.5s ease;
         }
     </style>
 </head>
 <body>
+    <div class="app-container">
+        <div class="app-header">
+            <div class="app-title">Quantum Calculator</div>
+            <div class="app-tabs">
+                <button class="tab-btn active">Calc</button>
+                <button class="tab-btn">Graph</button>
+                <button class="tab-btn">Convert</button>
+            </div>
+        </div>
 
-    <div class="calculator">
-        <input type="text" id="display" disabled />
-        <div>
-            <button class="button" onclick="appendToDisplay('7')">7</button>
-            <button class="button" onclick="appendToDisplay('8')">8</button>
-            <button class="button" onclick="appendToDisplay('9')">9</button>
-            <button class="button function" onclick="appendToDisplay('/')">/</button>
+        <div class="calculator-display">
+            <button class="menu-btn" id="menuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+            <input type="text" id="expression" disabled>
+            <input type="text" id="display" disabled>
         </div>
-        <div>
-            <button class="button" onclick="appendToDisplay('4')">4</button>
-            <button class="button" onclick="appendToDisplay('5')">5</button>
-            <button class="button" onclick="appendToDisplay('6')">6</button>
-            <button class="button function" onclick="appendToDisplay('*')">*</button>
+
+        <div class="calculator-buttons">
+            <!-- First row -->
+            <button class="btn btn-clear" onclick="clearAll()">AC</button>
+            <button class="btn btn-function" onclick="backspace()">⌫</button>
+            <button class="btn btn-function" onclick="appendToDisplay('(')">(</button>
+            <button class="btn btn-function" onclick="appendToDisplay(')')">)</button>
+            <button class="btn btn-operator" onclick="appendToDisplay('/')">÷</button>
+
+            <!-- Second row -->
+            <button class="btn btn-scientific" onclick="appendFunction('Math.sqrt(')">√x</button>
+            <button class="btn btn-number" onclick="appendToDisplay('7')">7</button>
+            <button class="btn btn-number" onclick="appendToDisplay('8')">8</button>
+            <button class="btn btn-number" onclick="appendToDisplay('9')">9</button>
+            <button class="btn btn-operator" onclick="appendToDisplay('*')">×</button>
+
+            <!-- Third row -->
+            <button class="btn btn-scientific" onclick="appendFunction('Math.pow(')">x^y</button>
+            <button class="btn btn-number" onclick="appendToDisplay('4')">4</button>
+            <button class="btn btn-number" onclick="appendToDisplay('5')">5</button>
+            <button class="btn btn-number" onclick="appendToDisplay('6')">6</button>
+            <button class="btn btn-operator" onclick="appendToDisplay('-')">−</button>
+
+            <!-- Fourth row -->
+            <button class="btn btn-scientific" onclick="appendFunction('Math.log(')">ln</button>
+            <button class="btn btn-number" onclick="appendToDisplay('1')">1</button>
+            <button class="btn btn-number" onclick="appendToDisplay('2')">2</button>
+            <button class="btn btn-number" onclick="appendToDisplay('3')">3</button>
+            <button class="btn btn-operator" onclick="appendToDisplay('+')">+</button>
+
+            <!-- Fifth row -->
+            <button class="btn btn-scientific" onclick="appendFunction('Math.log10(')">log</button>
+            <button class="btn btn-number" onclick="appendToDisplay('0')">0</button>
+            <button class="btn btn-number" onclick="appendToDisplay('.')">.</button>
+            <button class="btn btn-number" onclick="appendToDisplay('Math.PI')">π</button>
+            <button class="btn btn-equals" onclick="calculate()">=</button>
+
+            <!-- Sixth row - Scientific functions -->
+            <button class="btn btn-scientific" onclick="appendFunction('Math.sin(')">sin</button>
+            <button class="btn btn-scientific" onclick="appendFunction('Math.cos(')">cos</button>
+            <button class="btn btn-scientific" onclick="appendFunction('Math.tan(')">tan</button>
+            <button class="btn btn-scientific" onclick="appendFunction('factorial(')">x!</button>
+            <button class="btn btn-scientific" onclick="appendFunction('Math.exp(')">e^x</button>
+
+            <!-- Seventh row - Advanced functions -->
+            <button class="btn btn-scientific" onclick="appendFunction('Math.asin(')">sin⁻¹</button>
+            <button class="btn btn-scientific" onclick="appendFunction('Math.acos(')">cos⁻¹</button>
+            <button class="btn btn-scientific" onclick="appendFunction('Math.atan(')">tan⁻¹</button>
+            <button class="btn btn-scientific" onclick="appendToDisplay('Math.E')">e</button>
+            <button class="btn btn-scientific" onclick="appendFunction('toRadians(')">DEG→RAD</button>
         </div>
-        <div>
-            <button class="button" onclick="appendToDisplay('1')">1</button>
-            <button class="button" onclick="appendToDisplay('2')">2</button>
-            <button class="button" onclick="appendToDisplay('3')">3</button>
-            <button class="button function" onclick="appendToDisplay('-')">-</button>
+    </div>
+
+    <!-- Menu Panel -->
+    <div class="panel" id="menuPanel">
+        <div class="panel-content">
+            <div class="panel-header">
+                <div class="panel-title">Calculator Menu</div>
+                <button class="close-panel" id="closeMenu">&times;</button>
+            </div>
+            
+            <div class="settings-option">
+                <button class="panel-footer" onclick="showPanel('historyPanel')">
+                    <i class="fas fa-history"></i> Calculation History
+                </button>
+            </div>
+            
+            <div class="settings-option">
+                <button class="panel-footer" onclick="showPanel('settingsPanel')">
+                    <i class="fas fa-cog"></i> Settings
+                </button>
+            </div>
+            
+            <div class="settings-option">
+                <button class="panel-footer" onclick="showPanel('graphPanel')">
+                    <i class="fas fa-chart-line"></i> Graphing Calculator
+                </button>
+            </div>
+            
+            <div class="settings-option">
+                <button class="panel-footer" onclick="showPanel('converterPanel')">
+                    <i class="fas fa-exchange-alt"></i> Unit Converter
+                </button>
+            </div>
+            
+            <button class="panel-footer" onclick="hideAllPanels()">
+                <i class="fas fa-times"></i> Close Menu
+            </button>
         </div>
-        <div>
-            <button class="button" onclick="appendToDisplay('0')">0</button>
-            <button class="button" onclick="appendToDisplay('.')">.</button>
-            <button class="button double" onclick="clearDisplay()">C</button>
-            <button class="button function" onclick="appendToDisplay('+')">+</button>
+    </div>
+
+    <!-- History Panel -->
+    <div class="panel" id="historyPanel">
+        <div class="panel-content">
+            <div class="panel-header">
+                <div class="panel-title">Calculation History</div>
+                <button class="close-panel" id="closeHistory">&times;</button>
+            </div>
+            <div id="historyList"></div>
+            <button class="panel-footer" onclick="clearHistory()">
+                <i class="fas fa-trash"></i> Clear History
+            </button>
         </div>
-        <div>
-            <button class="button function" onclick="appendToDisplay('sqrt(')">√</button>
-            <button class="button function" onclick="appendToDisplay('pow(')">x²</button>
-            <button class="button function" onclick="appendToDisplay('sin(')">sin</button>
-            <button class="button function" onclick="appendToDisplay('cos(')">cos</button>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="panel" id="settingsPanel">
+        <div class="panel-content">
+            <div class="panel-header">
+                <div class="panel-title">Calculator Settings</div>
+                <button class="close-panel" id="closeSettings">&times;</button>
+            </div>
+            
+            <div class="settings-option">
+                <label class="settings-label">Angle Unit:</label>
+                <select class="settings-select" id="angleUnit">
+                    <option value="deg">Degrees</option>
+                    <option value="rad">Radians</option>
+                </select>
+            </div>
+            
+            <div class="settings-option">
+                <label class="settings-label">Display Precision:</label>
+                <select class="settings-select" id="displayPrecision">
+                    <option value="2">2 decimal places</option>
+                    <option value="4">4 decimal places</option>
+                    <option value="6">6 decimal places</option>
+                    <option value="8">8 decimal places</option>
+                    <option value="10">10 decimal places</option>
+                </select>
+            </div>
+            
+            <div class="settings-option">
+                <label class="settings-label">Theme:</label>
+                <select class="settings-select" id="themeSelect">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue">Blue</option>
+                </select>
+            </div>
+            
+            <button class="panel-footer" onclick="saveSettings()">
+                <i class="fas fa-save"></i> Save Settings
+            </button>
         </div>
-        <div>
-            <button class="button function" onclick="appendToDisplay('tan(')">tan</button>
-            <button class="button function" onclick="appendToDisplay('log(')">log</button>
-            <button class="button function" onclick="appendToDisplay('exp(')">exp</button>
-            <button class="button equals" onclick="calculate()">=</button>
+    </div>
+
+    <!-- Graph Panel -->
+    <div class="panel" id="graphPanel">
+        <div class="panel-content">
+            <div class="panel-header">
+                <div class="panel-title">Graphing Calculator</div>
+                <button class="close-panel" id="closeGraph">&times;</button>
+            </div>
+            
+            <div class="graph-container" id="graphCanvas">
+                <!-- Graph will be rendered here -->
+                <canvas id="graph" width="360" height="250"></canvas>
+            </div>
+            
+            <input type="text" class="graph-input" id="graphEquation" placeholder="Enter equation (e.g., x^2 + 3*x - 2)">
+            
+            <div class="graph-controls">
+                <button class="btn btn-primary" onclick="plotGraph()">
+                    <i class="fas fa-chart-line"></i> Plot
+                </button>
+                <button class="btn btn-clear" onclick="clearGraph()">
+                    <i class="fas fa-trash"></i> Clear
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Unit Converter Panel -->
+    <div class="panel" id="converterPanel">
+        <div class="panel-content">
+            <div class="panel-header">
+                <div class="panel-title">Unit Converter</div>
+                <button class="close-panel" id="closeConverter">&times;</button>
+            </div>
+            
+            <div class="settings-option">
+                <label class="settings-label">Conversion Type:</label>
+                <select class="settings-select" id="conversionType">
+                    <option value="length">Length</option>
+                    <option value="weight">Weight</option>
+                    <option value="temperature">Temperature</option>
+                    <option value="area">Area</option>
+                    <option value="volume">Volume</option>
+                    <option value="speed">Speed</option>
+                </select>
+            </div>
+            
+            <div class="settings-option">
+                <label class="settings-label">From:</label>
+                <select class="settings-select" id="fromUnit"></select>
+            </div>
+            
+            <div class="settings-option">
+                <label class="settings-label">To:</label>
+                <select class="settings-select" id="toUnit"></select>
+            </div>
+            
+            <input type="number" class="graph-input" id="converterValue" placeholder="Enter value">
+            
+            <button class="btn btn-primary" onclick="convertUnits()">
+                <i class="fas fa-exchange-alt"></i> Convert
+            </button>
+            
+            <div id="conversionResult" style="margin-top: 15px; font-size: 1.2rem; text-align: center;"></div>
         </div>
     </div>
 
     <script>
+        // DOM elements
         const display = document.getElementById('display');
+        const expressionDisplay = document.getElementById('expression');
+        const menuBtn = document.getElementById('menuBtn');
+        const menuPanel = document.getElementById('menuPanel');
+        const closeMenu = document.getElementById('closeMenu');
+        const historyPanel = document.getElementById('historyPanel');
+        const closeHistory = document.getElementById('closeHistory');
+        const historyList = document.getElementById('historyList');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const closeSettings = document.getElementById('closeSettings');
+        const graphPanel = document.getElementById('graphPanel');
+        const closeGraph = document.getElementById('closeGraph');
+        const converterPanel = document.getElementById('converterPanel');
+        const closeConverter = document.getElementById('closeConverter');
+        
+        // Calculator state
+        let currentExpression = '';
+        let calculationHistory = [];
+        let isDegreeMode = true;
+        let displayPrecision = 4;
+        let currentTheme = 'light';
+        
+        // Unit conversion data
+        const conversionData = {
+            length: {
+                units: ['meters', 'kilometers', 'centimeters', 'millimeters', 'inches', 'feet', 'yards', 'miles'],
+                factors: [1, 0.001, 100, 1000, 39.3701, 3.28084, 1.09361, 0.000621371]
+            },
+            weight: {
+                units: ['grams', 'kilograms', 'milligrams', 'pounds', 'ounces'],
+                factors: [1, 0.001, 1000, 0.00220462, 0.035274]
+            },
+            temperature: {
+                units: ['celsius', 'fahrenheit', 'kelvin'],
+                factors: [1, 1, 1] // Special handling
+            },
+            area: {
+                units: ['square meters', 'square kilometers', 'square feet', 'square miles', 'acres', 'hectares'],
+                factors: [1, 0.000001, 10.7639, 0.000000386102, 0.000247105, 0.0001]
+            },
+            volume: {
+                units: ['liters', 'milliliters', 'cubic meters', 'gallons', 'quarts', 'pints', 'cups'],
+                factors: [1, 1000, 0.001, 0.264172, 1.05669, 2.11338, 4.22675]
+            },
+            speed: {
+                units: ['km/h', 'm/s', 'mph', 'knots', 'ft/s'],
+                factors: [1, 0.277778, 0.621371, 0.539957, 0.911344]
+            }
+        };
 
-        // Append values to the display
+        // Initialize calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event listeners
+            menuBtn.addEventListener('click', () => showPanel('menuPanel'));
+            closeMenu.addEventListener('click', hideAllPanels);
+            closeHistory.addEventListener('click', hideAllPanels);
+            closeSettings.addEventListener('click', hideAllPanels);
+            closeGraph.addEventListener('click', hideAllPanels);
+            closeConverter.addEventListener('click', hideAllPanels);
+            
+            // Load saved data
+            loadHistory();
+            loadSettings();
+            setupUnitConverter();
+            
+            // Initialize graph canvas
+            initGraph();
+        });
+
+        // Panel management
+        function showPanel(panelId) {
+            hideAllPanels();
+            document.getElementById(panelId).classList.add('active');
+            
+            if (panelId === 'historyPanel') {
+                renderHistory();
+            }
+        }
+
+        function hideAllPanels() {
+            document.querySelectorAll('.panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+        }
+
+        // Calculator functions
         function appendToDisplay(value) {
-            display.value += value;
+            currentExpression += value;
+            updateDisplay();
         }
 
-        // Clear the display
-        function clearDisplay() {
-            display.value = '';
+        function appendFunction(func) {
+            currentExpression += func;
+            updateDisplay();
         }
 
-        // Evaluate the expression and show the result
+        function updateDisplay() {
+            display.value = currentExpression;
+            
+            // Show a simplified version in the expression display
+            let simplified = currentExpression
+                .replace(/Math\./g, '')
+                .replace(/\(/g, '(')
+                .replace(/\)/g, ')');
+            expressionDisplay.value = simplified;
+        }
+
+        function clearAll() {
+            currentExpression = '';
+            updateDisplay();
+        }
+
+        function backspace() {
+            currentExpression = currentExpression.slice(0, -1);
+            updateDisplay();
+        }
+
         function calculate() {
             try {
-                // Replace square root and powers for easier eval() interpretation
-                let expression = display.value;
-                expression = expression.replace(/sqrt/g, 'Math.sqrt');
-                expression = expression.replace(/pow/g, 'Math.pow');
-                expression = expression.replace(/log/g, 'Math.log');
-                expression = expression.replace(/exp/g, 'Math.exp');
-                expression = expression.replace(/sin/g, 'Math.sin');
-                expression = expression.replace(/cos/g, 'Math.cos');
-                expression = expression.replace(/tan/g, 'Math.tan');
-
+                // Replace display symbols with JavaScript equivalents
+                let expression = currentExpression;
+                
+                // Handle special functions
+                expression = expression.replace(/sin\(/g, isDegreeMode ? 'Math.sin(toRadians(' : 'Math.sin(');
+                expression = expression.replace(/cos\(/g, isDegreeMode ? 'Math.cos(toRadians(' : 'Math.cos(');
+                expression = expression.replace(/tan\(/g, isDegreeMode ? 'Math.tan(toRadians(' : 'Math.tan(');
+                expression = expression.replace(/sin⁻¹\(/g, isDegreeMode ? 'toDegrees(Math.asin(' : 'Math.asin(');
+                expression = expression.replace(/cos⁻¹\(/g, isDegreeMode ? 'toDegrees(Math.acos(' : 'Math.acos(');
+                expression = expression.replace(/tan⁻¹\(/g, isDegreeMode ? 'toDegrees(Math.atan(' : 'Math.atan(');
+                expression = expression.replace(/factorial\(/g, 'factorial(');
+                expression = expression.replace(/\^/g, '**');
+                
                 // Calculate the result
                 const result = eval(expression);
-                display.value = result;
+                const formattedResult = formatResult(result);
+                
+                // Add to history
+                addToHistory(currentExpression, result);
+                
+                // Show result
+                currentExpression = formattedResult;
+                updateDisplay();
+                
+                // Add pulse animation
+                display.classList.add('pulse');
+                setTimeout(() => display.classList.remove('pulse'), 500);
             } catch (e) {
-                display.value = 'Error';
+                currentExpression = 'Error';
+                updateDisplay();
+                setTimeout(clearAll, 1500);
+            }
+        }
+
+        function formatResult(value) {
+            // Format number with specified precision
+            if (typeof value === 'number') {
+                // Check if it's an integer
+                if (Number.isInteger(value)) {
+                    return value.toString();
+                }
+                
+                // Format with specified decimal places
+                return value.toFixed(displayPrecision).replace(/\.?0+$/, '');
+            }
+            return value.toString();
+        }
+
+        // Math functions
+        function factorial(n) {
+            if (n < 0) return NaN;
+            if (n === 0 || n === 1) return 1;
+            let result = 1;
+            for (let i = 2; i <= n; i++) {
+                result *= i;
+            }
+            return result;
+        }
+
+        function toRadians(degrees) {
+            return degrees * Math.PI / 180;
+        }
+
+        function toDegrees(radians) {
+            return radians * 180 / Math.PI;
+        }
+
+        // History functions
+        function addToHistory(expression, result) {
+            const calculation = {
+                expression: expression.replace(/Math\./g, ''),
+                result: result,
+                timestamp: new Date()
+            };
+            
+            calculationHistory.unshift(calculation);
+            
+            // Keep only last 50 calculations
+            if (calculationHistory.length > 50) {
+                calculationHistory.pop();
+            }
+            
+            // Save to localStorage
+            saveHistory();
+        }
+
+        function renderHistory() {
+            historyList.innerHTML = '';
+            
+            calculationHistory.forEach((calc, index) => {
+                const item = document.createElement('div');
+                item.className = 'history-item fade-in';
+                item.style.animationDelay = `${index * 0.05}s`;
+                item.innerHTML = `
+                    <div class="history-expression">${calc.expression}</div>
+                    <div class="history-result">= ${formatResult(calc.result)}</div>
+                `;
+                
+                // Click to use this calculation
+                item.addEventListener('click', () => {
+                    currentExpression = calc.result.toString();
+                    updateDisplay();
+                    hideAllPanels();
+                });
+                
+                historyList.appendChild(item);
+            });
+        }
+
+        function clearHistory() {
+            calculationHistory = [];
+            saveHistory();
+            renderHistory();
+        }
+
+        function saveHistory() {
+            localStorage.setItem('calculatorHistory', JSON.stringify(calculationHistory));
+        }
+
+        function loadHistory() {
+            const savedHistory = localStorage.getItem('calculatorHistory');
+            if (savedHistory) {
+                calculationHistory = JSON.parse(savedHistory);
+            }
+        }
+
+        // Settings functions
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('calculatorSettings')) || {};
+            
+            isDegreeMode = settings.angleUnit !== 'rad';
+            displayPrecision = settings.displayPrecision || 4;
+            currentTheme = settings.theme || 'light';
+            
+            // Update UI
+            document.getElementById('angleUnit').value = isDegreeMode ? 'deg' : 'rad';
+            document.getElementById('displayPrecision').value = displayPrecision;
+            document.getElementById('themeSelect').value = currentTheme;
+        }
+
+        function saveSettings() {
+            const settings = {
+                angleUnit: document.getElementById('angleUnit').value,
+                displayPrecision: parseInt(document.getElementById('displayPrecision').value),
+                theme: document.getElementById('themeSelect').value
+            };
+            
+            localStorage.setItem('calculatorSettings', JSON.stringify(settings));
+            
+            // Update current settings
+            isDegreeMode = settings.angleUnit === 'deg';
+            displayPrecision = settings.displayPrecision;
+            currentTheme = settings.theme;
+            
+            // Apply theme
+            applyTheme();
+            
+            hideAllPanels();
+        }
+
+        function applyTheme() {
+            // This would be expanded to actually change the theme
+            console.log(`Theme changed to ${currentTheme}`);
+        }
+
+        // Graphing functions
+        function initGraph() {
+            const canvas = document.getElementById('graph');
+            if (canvas.getContext) {
+                // Canvas is ready for drawing
+            }
+        }
+
+        function plotGraph() {
+            const equation = document.getElementById('graphEquation').value;
+            if (!equation) return;
+            
+            // In a real implementation, this would parse the equation and plot it
+            alert(`Graphing: ${equation}\nThis would graph the function in a real implementation.`);
+        }
+
+        function clearGraph() {
+            document.getElementById('graphEquation').value = '';
+            // Clear the canvas
+        }
+
+        // Unit conversion functions
+        function setupUnitConverter() {
+            const conversionType = document.getElementById('conversionType');
+            const fromUnit = document.getElementById('fromUnit');
+            const toUnit = document.getElementById('toUnit');
+            
+            // Populate initial units
+            updateUnitOptions();
+            
+            // Update options when type changes
+            conversionType.addEventListener('change', updateUnitOptions);
+            
+            function updateUnitOptions() {
+                const type = conversionType.value;
+                const units = conversionData[type].units;
+                
+                // Clear existing options
+                fromUnit.innerHTML = '';
+                toUnit.innerHTML = '';
+                
+                // Add new options
+                units.forEach(unit => {
+                    const option1 = document.createElement('option');
+                    option1.value = unit;
+                    option1.textContent = unit;
+                    fromUnit.appendChild(option1);
+                    
+                    const option2 = document.createElement('option');
+                    option2.value = unit;
+                    option2.textContent = unit;
+                    toUnit.appendChild(option2);
+                });
+                
+                // Set different default "to" unit
+                if (units.length > 1) {
+                    toUnit.selectedIndex = 1;
+                }
+            }
+        }
+
+        function convertUnits() {
+            const type = document.getElementById('conversionType').value;
+            const fromUnit = document.getElementById('fromUnit').value;
+            const toUnit = document.getElementById('toUnit').value;
+            const value = parseFloat(document.getElementById('converterValue').value);
+            
+            if (isNaN(value)) {
+                document.getElementById('conversionResult').textContent = 'Please enter a valid number';
+                return;
+            }
+            
+            let result;
+            
+            // Special handling for temperature
+            if (type === 'temperature') {
+                result = convertTemperature(value, fromUnit, toUnit);
+            } else {
+                // Standard conversion for other types
+                const units = conversionData[type].units;
+                const factors = conversionData[type].factors;
+                
+                const fromIndex = units.indexOf(fromUnit);
+                const toIndex = units.indexOf(toUnit);
+                
+                if (fromIndex === -1 || toIndex === -1) return;
+                
+                // Convert to base unit first, then to target unit
+                const baseValue = value / factors[fromIndex];
+                result = baseValue * factors[toIndex];
+            }
+            
+            document.getElementById('conversionResult').textContent = 
+                `${value} ${fromUnit} = ${result.toFixed(6)} ${toUnit}`;
+        }
+
+        function convertTemperature(value, fromUnit, toUnit) {
+            // Convert to Celsius first
+            let celsius;
+            switch (fromUnit) {
+                case 'celsius':
+                    celsius = value;
+                    break;
+                case 'fahrenheit':
+                    celsius = (value - 32) * 5/9;
+                    break;
+                case 'kelvin':
+                    celsius = value - 273.15;
+                    break;
+            }
+            
+            // Convert from Celsius to target unit
+            switch (toUnit) {
+                case 'celsius':
+                    return celsius;
+                case 'fahrenheit':
+                    return celsius * 9/5 + 32;
+                case 'kelvin':
+                    return celsius + 273.15;
             }
         }
     </script>
-
 </body>
 </html>
-
-  
-  
