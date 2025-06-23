@@ -1,87 +1,543 @@
-  
-  <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <title>Text Shortener Tool</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Text Shortener </title>
   <style>
+    :root {
+      --primary-color: #4361ee;
+      --secondary-color: #3f37c9;
+      --light-color: #f8f9fa;
+      --dark-color: #212529;
+      --success-color: #4bb543;
+      --warning-color: #ffc107;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       padding: 20px;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
+      color: var(--dark-color);
     }
 
-    h2 {
-      color: #007bff;
+    .container {
+      width: 90%;
+      max-width: 800px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      margin: 20px 0;
+    }
+
+    h1 {
+      color: var(--primary-color);
       text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+    }
+
+    .input-section, .output-section {
+      margin-bottom: 25px;
     }
 
     #textBox {
-      width: 90%;
-      max-width: 500px;
-      min-height: 150px;
-      padding: 10px;
+      width: 100%;
+      min-height: 200px;
+      padding: 15px;
       font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background: #fff;
-      margin-bottom: 15px;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+      background: var(--light-color);
+      margin-bottom: 20px;
       outline: none;
-      overflow-y: auto;
-      white-space: pre-wrap;
+      resize: vertical;
+      transition: border 0.3s ease;
+    }
+
+    #textBox:focus {
+      border-color: var(--primary-color);
+    }
+
+    #textBox::placeholder {
+      color: #adb5bd;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      min-width: 200px;
+    }
+
+    label {
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark-color);
+    }
+
+    select, input {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ced4da;
+      font-size: 16px;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     button {
-      padding: 10px 20px;
+      padding: 12px 24px;
       font-size: 16px;
       border: none;
-      background-color: #007bff;
+      background: var(--primary-color);
       color: white;
       border-radius: 8px;
       cursor: pointer;
-      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
     button:hover {
-      background-color: #0056b3;
+      background: var(--secondary-color);
+      transform: translateY(-2px);
     }
 
-    #output {
+    button:active {
+      transform: translateY(0);
+    }
+
+    button.secondary {
+      background: #6c757d;
+    }
+
+    button.secondary:hover {
+      background: #5a6268;
+    }
+
+    button.success {
+      background: var(--success-color);
+    }
+
+    button.success:hover {
+      background: #3aa33a;
+    }
+
+    button.warning {
+      background: var(--warning-color);
+      color: var(--dark-color);
+    }
+
+    button.warning:hover {
+      background: #e0a800;
+    }
+
+    #outputText {
+      width: 100%;
+      min-height: 200px;
+      padding: 15px;
       font-size: 16px;
+      border-radius: 10px;
+      border: 2px solid #e9ecef;
+      background: #f8f9fa;
+      margin-top: 10px;
+      resize: vertical;
+    }
+
+    .stats {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
       margin-top: 20px;
-      color: #333;
+      padding: 15px;
+      background: #f1f3f5;
+      border-radius: 10px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-label {
+      font-size: 14px;
+      color: #6c757d;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .tooltip {
+      position: relative;
+      display: inline-block;
+    }
+
+    .tooltip .tooltiptext {
+      visibility: hidden;
+      width: 200px;
+      background-color: #555;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 5px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%;
+      left: 50%;
+      margin-left: -100px;
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+    }
+
+    .tooltip:hover .tooltiptext {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 20px 15px;
+      }
+      
+      .controls {
+        flex-direction: column;
+      }
+      
+      .control-group {
+        width: 100%;
+      }
+      
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h2>Text Shortener Tool</h2>
-
-  <div id="textBox" contenteditable="true" placeholder="Paste or type your text here..."></div>
-
-  <button onclick="shortenText()">Shorten Text</button>
-
-  <div id="output"></div>
+  <div class="container">
+    <h1>Text Shortener </h1>
+    
+    <div class="input-section">
+      <div id="textBox" contenteditable="true" placeholder="Paste or type your text here..."></div>
+      
+      <div class="controls">
+        <div class="control-group">
+          <label for="shortenMethod">Shortening Method</label>
+          <select id="shortenMethod">
+            <option value="characters">By Character Limit</option>
+            <option value="words">By Word Limit</option>
+            <option value="sentences">By Sentence Limit</option>
+            <option value="paragraphs">By Paragraph Limit</option>
+          </select>
+        </div>
+        
+        <div class="control-group">
+          <label for="limitValue">Limit Value</label>
+          <input type="number" id="limitValue" min="1" value="100">
+        </div>
+        
+        <div class="control-group">
+          <label for="summaryType">Summary Type</label>
+          <select id="summaryType">
+            <option value="ellipsis">Simple truncation (...)</option>
+            <option value="readable">Readable summary</option>
+            <option value="firstlast">First and last parts</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="shortenText()" class="tooltip">
+          <span class="tooltiptext">Shorten text according to selected parameters</span>
+          Shorten Text
+        </button>
+        <button onclick="summarizeText()" class="secondary tooltip">
+          <span class="tooltiptext">Create a more intelligent summary</span>
+          Summarize
+        </button>
+        <button onclick="copyOriginal()" class="secondary tooltip">
+          <span class="tooltiptext">Copy original text to clipboard</span>
+          Copy Original
+        </button>
+        <button onclick="copyResult()" class="success tooltip">
+          <span class="tooltiptext">Copy shortened text to clipboard</span>
+          Copy Result
+        </button>
+        <button onclick="clearAll()" class="warning tooltip">
+          <span class="tooltiptext">Clear all text</span>
+          Clear All
+        </button>
+      </div>
+    </div>
+    
+    <div class="output-section">
+      <label for="outputText">Shortened Text:</label>
+      <div id="outputText" contenteditable="true"></div>
+      
+      <div class="stats">
+        <div class="stat-item">
+          <span class="stat-label">Original Length</span>
+          <span class="stat-value" id="originalLength">0 chars</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Shortened Length</span>
+          <span class="stat-value" id="shortenedLength">0 chars</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Reduction</span>
+          <span class="stat-value" id="reduction">0%</span>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <script>
-    function shortenText() {
-      var content = document.getElementById("textBox").innerText.trim();
+    // DOM elements
+    const textBox = document.getElementById('textBox');
+    const outputText = document.getElementById('outputText');
+    const shortenMethod = document.getElementById('shortenMethod');
+    const limitValue = document.getElementById('limitValue');
+    const summaryType = document.getElementById('summaryType');
+    const originalLengthEl = document.getElementById('originalLength');
+    const shortenedLengthEl = document.getElementById('shortenedLength');
+    const reductionEl = document.getElementById('reduction');
+    
+    // Initialize with empty text
+    updateStats();
+    
+    // Update stats when text changes
+    textBox.addEventListener('input', updateStats);
+    outputText.addEventListener('input', updateStats);
+    
+    function updateStats() {
+      const originalText = textBox.innerText.trim();
+      const shortenedText = outputText.innerText.trim();
       
-      if (content.length <= 100) {
-        document.getElementById("output").innerText = "Text is already short!";
+      const originalLen = originalText.length;
+      const shortenedLen = shortenedText.length;
+      
+      originalLengthEl.textContent = `${originalLen} chars`;
+      shortenedLengthEl.textContent = `${shortenedLen} chars`;
+      
+      if (originalLen > 0) {
+        const reduction = Math.round(((originalLen - shortenedLen) / originalLen) * 100);
+        reductionEl.textContent = `${reduction}%`;
+      } else {
+        reductionEl.textContent = '0%';
+      }
+    }
+    
+    function shortenText() {
+      const content = textBox.innerText.trim();
+      const method = shortenMethod.value;
+      const limit = parseInt(limitValue.value);
+      const type = summaryType.value;
+      
+      if (!content) {
+        outputText.innerText = "Please enter some text first!";
         return;
       }
       
-      // Shorten text to the first 100 characters and add ellipsis
-      var shortened = content.substring(0, 100) + "...";
-      document.getElementById("output").innerText = "Shortened Text: " + shortened;
+      let shortened = "";
+      
+      switch(method) {
+        case 'characters':
+          shortened = shortenByCharacters(content, limit, type);
+          break;
+        case 'words':
+          shortened = shortenByWords(content, limit, type);
+          break;
+        case 'sentences':
+          shortened = shortenBySentences(content, limit, type);
+          break;
+        case 'paragraphs':
+          shortened = shortenByParagraphs(content, limit, type);
+          break;
+      }
+      
+      outputText.innerText = shortened;
+      updateStats();
+    }
+    
+    function shortenByCharacters(text, limit, type) {
+      if (text.length <= limit) {
+        return "Text is already shorter than the limit!";
+      }
+      
+      switch(type) {
+        case 'ellipsis':
+          return text.substring(0, limit) + "...";
+        case 'readable':
+          // Find the last space before the limit to avoid cutting words
+          const lastSpace = text.lastIndexOf(' ', limit);
+          return text.substring(0, lastSpace > 0 ? lastSpace : limit) + "...";
+        case 'firstlast':
+          const firstPart = Math.floor(limit * 0.6);
+          const lastPart = limit - firstPart;
+          return text.substring(0, firstPart) + " [...] " + 
+                 text.substring(text.length - lastPart);
+        default:
+          return text.substring(0, limit) + "...";
+      }
+    }
+    
+    function shortenByWords(text, limit, type) {
+      const words = text.split(/\s+/).filter(word => word.length > 0);
+      
+      if (words.length <= limit) {
+        return "Text already has fewer words than the limit!";
+      }
+      
+      switch(type) {
+        case 'ellipsis':
+          return words.slice(0, limit).join(' ') + "...";
+        case 'readable':
+          // Try to end with a complete sentence
+          const partial = words.slice(0, limit).join(' ');
+          const lastPeriod = partial.lastIndexOf('.');
+          return lastPeriod > 0 ? partial.substring(0, lastPeriod + 1) : partial + "...";
+        case 'firstlast':
+          const firstWords = Math.floor(limit * 0.6);
+          const lastWords = limit - firstWords;
+          return words.slice(0, firstWords).join(' ') + " [...] " + 
+                 words.slice(-lastWords).join(' ');
+        default:
+          return words.slice(0, limit).join(' ') + "...";
+      }
+    }
+    
+    function shortenBySentences(text, limit, type) {
+      const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      
+      if (sentences.length <= limit) {
+        return "Text already has fewer sentences than the limit!";
+      }
+      
+      switch(type) {
+        case 'ellipsis':
+          return sentences.slice(0, limit).join('. ') + ".";
+        case 'readable':
+          // Try to make it more coherent
+          return sentences.slice(0, limit).join('. ') + ".";
+        case 'firstlast':
+          const firstSentences = Math.floor(limit * 0.5);
+          const lastSentences = limit - firstSentences;
+          return sentences.slice(0, firstSentences).join('. ') + ". [...] " + 
+                 sentences.slice(-lastSentences).join('. ') + ".";
+        default:
+          return sentences.slice(0, limit).join('. ') + ".";
+      }
+    }
+    
+    function shortenByParagraphs(text, limit, type) {
+      const paragraphs = text.split(/\n+/).filter(p => p.trim().length > 0);
+      
+      if (paragraphs.length <= limit) {
+        return "Text already has fewer paragraphs than the limit!";
+      }
+      
+      switch(type) {
+        case 'ellipsis':
+          return paragraphs.slice(0, limit).join('\n\n');
+        case 'readable':
+          return paragraphs.slice(0, limit).join('\n\n');
+        case 'firstlast':
+          const firstParagraphs = Math.floor(limit * 0.5);
+          const lastParagraphs = limit - firstParagraphs;
+          return paragraphs.slice(0, firstParagraphs).join('\n\n') + 
+                 "\n\n[...]\n\n" + 
+                 paragraphs.slice(-lastParagraphs).join('\n\n');
+        default:
+          return paragraphs.slice(0, limit).join('\n\n');
+      }
+    }
+    
+    function summarizeText() {
+      const content = textBox.innerText.trim();
+      
+      if (!content) {
+        outputText.innerText = "Please enter some text first!";
+        return;
+      }
+      
+      // Simple summarization algorithm - can be enhanced further
+      const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 0);
+      
+      if (sentences.length <= 3) {
+        outputText.innerText = content; // Too short to summarize
+        return;
+      }
+      
+      // Take first, last and some middle sentences
+      const summary = [
+        sentences[0],
+        sentences[Math.floor(sentences.length/2)],
+        sentences[sentences.length-1]
+      ].join('. ') + ".";
+      
+      outputText.innerText = summary;
+      updateStats();
+    }
+    
+    function copyOriginal() {
+      copyToClipboard(textBox.innerText, 'Original text copied!');
+    }
+    
+    function copyResult() {
+      copyToClipboard(outputText.innerText, 'Shortened text copied!');
+    }
+    
+    function copyToClipboard(text, successMessage) {
+      if (!text.trim()) {
+        alert("Nothing to copy!");
+        return;
+      }
+      
+      navigator.clipboard.writeText(text).then(() => {
+        // Show temporary feedback
+        const btn = event.target.closest('button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = `<span>✓ ${successMessage}</span>`;
+        btn.classList.add('success');
+        setTimeout(() => {
+          btn.innerHTML = originalText;
+          btn.classList.remove('success');
+        }, 2000);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+        alert("Failed to copy text. Please try again.");
+      });
+    }
+    
+    function clearAll() {
+      if (confirm("Are you sure you want to clear all text?")) {
+        textBox.innerText = '';
+        outputText.innerText = '';
+        updateStats();
+      }
     }
   </script>
-
 </body>
 </html>
-
-  
-  
