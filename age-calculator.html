@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Age Calculator | Calculate Exact Age</title>
-  <meta name="description" content="Calculate your exact age in years, months, days, hours and minutes. Find out how many days until your next birthday.">
+  <title>GST Calculator | India GST Calculation Tool</title>
+  <meta name="description" content="Comprehensive GST calculator with multiple tax slabs, reverse calculation, and detailed breakdown">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -16,74 +16,73 @@
       --dark: #212529;
       --gray: #6c757d;
       --light-gray: #e9ecef;
-      --border-radius: 12px;
+      --success: #28a745;
+      --border-radius: 10px;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    
+
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-    
+
     body {
       font-family: 'Poppins', sans-serif;
       background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
       min-height: 100vh;
       color: var(--dark);
       line-height: 1.6;
-      display: flex;
-      justify-content: center;
-      align-items: center;
       padding: 20px;
     }
-    
+
     .app-container {
-      max-width: 500px;
       width: 100%;
+      max-width: 500px;
       background-color: #fff;
-      border-radius: var(--border-radius);
-      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
       overflow: hidden;
       transition: transform 0.3s ease;
     }
-    
+
     .app-container:hover {
       transform: translateY(-5px);
     }
-    
-    header {
+
+    .app-header {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
       padding: 25px;
       text-align: center;
     }
-    
+
     h1 {
-      font-size: 2rem;
+      font-size: 1.8rem;
       margin-bottom: 10px;
     }
-    
+
     .subtitle {
       font-weight: 300;
       opacity: 0.9;
     }
-    
-    .main-content {
-      padding: 30px;
+
+    .app-content {
+      padding: 25px;
     }
-    
+
     .input-group {
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
-    
+
     label {
       display: block;
       margin-bottom: 8px;
       font-weight: 500;
       color: var(--dark);
     }
-    
-    input[type="date"] {
+
+    input[type="number"], select {
       width: 100%;
       padding: 12px 15px;
       font-size: 1rem;
@@ -91,12 +90,41 @@
       border-radius: var(--border-radius);
       transition: border-color 0.3s ease;
     }
-    
-    input[type="date"]:focus {
+
+    input[type="number"]:focus, select:focus {
       outline: none;
       border-color: var(--primary);
     }
-    
+
+    .radio-group {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .radio-option {
+      flex: 1;
+    }
+
+    .radio-option input {
+      display: none;
+    }
+
+    .radio-option label {
+      display: block;
+      padding: 10px;
+      background-color: var(--light);
+      border-radius: var(--border-radius);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .radio-option input:checked + label {
+      background-color: var(--primary);
+      color: white;
+    }
+
     .btn {
       width: 100%;
       padding: 14px 20px;
@@ -110,29 +138,38 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      margin-bottom: 20px;
     }
-    
+
     .btn-primary {
       background: linear-gradient(to right, var(--primary), var(--secondary));
       color: white;
       box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
     }
-    
+
     .btn-primary:hover {
       background: linear-gradient(to right, var(--primary-dark), var(--secondary));
       transform: translateY(-2px);
       box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
     }
-    
+
+    .btn-secondary {
+      background-color: white;
+      border: 2px solid var(--light-gray);
+      color: var(--gray);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
     .result-container {
       background-color: var(--light);
       border-radius: var(--border-radius);
       padding: 20px;
-      margin-top: 20px;
-      display: none;
+      margin-top: 25px;
     }
-    
+
     .result-title {
       font-size: 1.2rem;
       font-weight: 600;
@@ -140,95 +177,99 @@
       color: var(--primary);
       text-align: center;
     }
-    
-    .age-stats {
+
+    .result-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 15px;
     }
-    
-    .stat-card {
+
+    .result-item {
       background-color: white;
       border-radius: var(--border-radius);
       padding: 15px;
       text-align: center;
-      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+      box-shadow: var(--shadow);
     }
-    
-    .stat-value {
-      font-size: 1.5rem;
+
+    .result-value {
+      font-size: 1.3rem;
       font-weight: 700;
       margin-bottom: 5px;
       color: var(--primary);
     }
-    
-    .stat-label {
-      font-size: 0.8rem;
+
+    .result-label {
+      font-size: 0.9rem;
       color: var(--gray);
     }
-    
-    .next-birthday {
+
+    .breakdown {
       margin-top: 20px;
       padding-top: 20px;
       border-top: 1px solid var(--light-gray);
-      text-align: center;
     }
-    
-    .next-birthday-text {
-      font-size: 0.9rem;
-      color: var(--gray);
+
+    .breakdown-title {
+      font-weight: 600;
+      margin-bottom: 10px;
     }
-    
-    .next-birthday-days {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: var(--primary);
-      margin-top: 5px;
+
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--light-gray);
     }
-    
+
+    .breakdown-item:last-child {
+      border-bottom: none;
+    }
+
     .error {
       color: #f72585;
       font-size: 0.9rem;
-      margin-top: 10px;
-      text-align: center;
+      margin-top: 5px;
       display: none;
     }
-    
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      font-size: 0.8rem;
-      color: var(--gray);
+
+    .gst-slabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
     }
-    
-    @media (max-width: 768px) {
-      .app-container {
-        margin: 15px auto;
+
+    .gst-slab {
+      padding: 10px;
+      background-color: var(--light);
+      border-radius: var(--border-radius);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .gst-slab.active {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    @media (max-width: 600px) {
+      .gst-slabs {
+        grid-template-columns: 1fr 1fr;
       }
       
-      header {
-        padding: 20px 15px;
-      }
-      
-      h1 {
-        font-size: 1.6rem;
-      }
-      
-      .main-content {
-        padding: 20px;
-      }
-      
-      .age-stats {
+      .result-grid {
         grid-template-columns: 1fr;
       }
     }
-    
+
     /* Animation */
     @keyframes fadeIn {
       from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    
+
     .fade-in {
       animation: fadeIn 0.5s ease forwards;
     }
@@ -236,144 +277,317 @@
 </head>
 <body>
   <div class="app-container">
-    <header>
-      <h1>Age Calculator</h1>
-      <p class="subtitle">Calculate your exact age and time until next birthday</p>
-    </header>
+    <div class="app-header">
+      <h1>GST Calculator</h1>
+      <p class="subtitle">Calculate GST with multiple slabs and options</p>
+    </div>
     
-    <div class="main-content">
+    <div class="app-content">
       <div class="input-group">
-        <label for="dob"><i class="fas fa-calendar-alt"></i> Date of Birth</label>
-        <input type="date" id="dob" max="">
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="forwardCalc" name="calculationType" value="forward" checked>
+            <label for="forwardCalc">Forward Calculation</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="reverseCalc" name="calculationType" value="reverse">
+            <label for="reverseCalc">Reverse Calculation</label>
+          </div>
+        </div>
       </div>
       
-      <button id="calculateBtn" class="btn btn-primary">
-        <i class="fas fa-calculator"></i> Calculate Age
+      <div class="input-group" id="amountGroup">
+        <label for="amount">Amount (₹)</label>
+        <input type="number" id="amount" placeholder="Enter amount">
+        <div class="error" id="amountError">Please enter a valid amount</div>
+      </div>
+      
+      <div class="input-group" id="totalAmountGroup" style="display: none;">
+        <label for="totalAmount">Total Amount (Incl. GST) (₹)</label>
+        <input type="number" id="totalAmount" placeholder="Enter total amount">
+        <div class="error" id="totalAmountError">Please enter a valid amount</div>
+      </div>
+      
+      <div class="input-group">
+        <label>GST Rate</label>
+        <div class="gst-slabs">
+          <div class="gst-slab active" data-rate="5">5%</div>
+          <div class="gst-slab" data-rate="12">12%</div>
+          <div class="gst-slab" data-rate="18">18%</div>
+          <div class="gst-slab" data-rate="28">28%</div>
+          <div class="gst-slab" data-rate="0">0%</div>
+          <div class="gst-slab" id="customRate">Custom</div>
+        </div>
+        <input type="number" id="gstRate" placeholder="Enter GST rate" style="display: none; margin-top: 10px;">
+        <div class="error" id="gstRateError">Please enter a valid GST rate (0-28%)</div>
+      </div>
+      
+      <div class="input-group">
+        <label for="gstType">GST Type</label>
+        <select id="gstType">
+          <option value="inclusive">Inclusive of GST</option>
+          <option value="exclusive">Exclusive of GST</option>
+        </select>
+      </div>
+      
+      <button class="btn btn-primary" id="calculateBtn">
+        <i class="fas fa-calculator"></i> Calculate GST
       </button>
       
-      <div id="error" class="error">
-        Please select a valid date of birth
-      </div>
+      <button class="btn btn-secondary" id="resetBtn">
+        <i class="fas fa-redo"></i> Reset
+      </button>
       
-      <div id="resultContainer" class="result-container">
-        <div class="result-title">Your Age</div>
+      <div class="result-container fade-in" id="resultContainer" style="display: none;">
+        <div class="result-title">GST Calculation Results</div>
         
-        <div class="age-stats">
-          <div class="stat-card">
-            <div class="stat-value" id="years">0</div>
-            <div class="stat-label">Years</div>
+        <div class="result-grid">
+          <div class="result-item">
+            <div class="result-value" id="gstAmount">₹0</div>
+            <div class="result-label">GST Amount</div>
           </div>
-          <div class="stat-card">
-            <div class="stat-value" id="months">0</div>
-            <div class="stat-label">Months</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="days">0</div>
-            <div class="stat-label">Days</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="hours">0</div>
-            <div class="stat-label">Hours</div>
+          <div class="result-item">
+            <div class="result-value" id="totalWithGST">₹0</div>
+            <div class="result-label">Total Amount</div>
           </div>
         </div>
         
-        <div class="next-birthday">
-          <div class="next-birthday-text">Time until your next birthday:</div>
-          <div class="next-birthday-days" id="nextBirthday">0 days</div>
+        <div class="breakdown">
+          <div class="breakdown-title">Detailed Breakdown:</div>
+          
+          <div class="breakdown-item">
+            <span>Original Amount:</span>
+            <span id="originalAmount">₹0</span>
+          </div>
+          
+          <div class="breakdown-item">
+            <span>CGST (<span id="cgstRate">0</span>%):</span>
+            <span id="cgstAmount">₹0</span>
+          </div>
+          
+          <div class="breakdown-item">
+            <span>SGST (<span id="sgstRate">0</span>%):</span>
+            <span id="sgstAmount">₹0</span>
+          </div>
+          
+          <div class="breakdown-item">
+            <span>IGST (<span id="igstRate">0</span>%):</span>
+            <span id="igstAmount">₹0</span>
+          </div>
+          
+          <div class="breakdown-item" style="font-weight: 600;">
+            <span>Total Amount:</span>
+            <span id="finalAmount">₹0</span>
+          </div>
         </div>
       </div>
     </div>
-    
-    <footer>
-      <p>Your data is processed in your browser and never sent to any server.</p>
-      <p>© 2025 Age Calculator. All rights reserved.</p>
-    </footer>
   </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Set max date to today
-      const dobInput = document.getElementById('dob');
-      const today = new Date().toISOString().split('T')[0];
-      dobInput.max = today;
-      
-      // Calculate age when button is clicked
-      document.getElementById('calculateBtn').addEventListener('click', calculateAge);
-      
-      // Also calculate when Enter is pressed in date input
-      dobInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-          calculateAge();
-        }
-      });
-    });
-    
-    function calculateAge() {
-      const dob = document.getElementById('dob').value;
-      const errorElement = document.getElementById('error');
+      // DOM elements
+      const forwardCalc = document.getElementById('forwardCalc');
+      const reverseCalc = document.getElementById('reverseCalc');
+      const amountGroup = document.getElementById('amountGroup');
+      const totalAmountGroup = document.getElementById('totalAmountGroup');
+      const amountInput = document.getElementById('amount');
+      const totalAmountInput = document.getElementById('totalAmount');
+      const gstSlabs = document.querySelectorAll('.gst-slab');
+      const gstRateInput = document.getElementById('gstRate');
+      const customRateBtn = document.getElementById('customRate');
+      const gstTypeSelect = document.getElementById('gstType');
+      const calculateBtn = document.getElementById('calculateBtn');
+      const resetBtn = document.getElementById('resetBtn');
       const resultContainer = document.getElementById('resultContainer');
       
-      // Validate input
-      if (!dob) {
-        errorElement.style.display = 'block';
+      // Error elements
+      const amountError = document.getElementById('amountError');
+      const totalAmountError = document.getElementById('totalAmountError');
+      const gstRateError = document.getElementById('gstRateError');
+      
+      // Result elements
+      const gstAmount = document.getElementById('gstAmount');
+      const totalWithGST = document.getElementById('totalWithGST');
+      const originalAmount = document.getElementById('originalAmount');
+      const cgstRate = document.getElementById('cgstRate');
+      const cgstAmount = document.getElementById('cgstAmount');
+      const sgstRate = document.getElementById('sgstRate');
+      const sgstAmount = document.getElementById('sgstAmount');
+      const igstRate = document.getElementById('igstRate');
+      const igstAmount = document.getElementById('igstAmount');
+      const finalAmount = document.getElementById('finalAmount');
+      
+      // Initialize variables
+      let currentGstRate = 5;
+      let isCustomRate = false;
+      
+      // Event listeners
+      forwardCalc.addEventListener('change', toggleCalculationType);
+      reverseCalc.addEventListener('change', toggleCalculationType);
+      
+      gstSlabs.forEach(slab => {
+        slab.addEventListener('click', function() {
+          if (this.id === 'customRate') {
+            isCustomRate = true;
+            gstRateInput.style.display = 'block';
+            gstRateInput.focus();
+            gstSlabs.forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+          } else {
+            isCustomRate = false;
+            gstRateInput.style.display = 'none';
+            gstSlabs.forEach(s => s.classList.remove('active'));
+            this.classList.add('active');
+            currentGstRate = parseFloat(this.getAttribute('data-rate'));
+          }
+        });
+      });
+      
+      gstRateInput.addEventListener('input', function() {
+        const rate = parseFloat(this.value);
+        if (!isNaN(rate) && rate >= 0 && rate <= 28) {
+          currentGstRate = rate;
+          gstRateError.style.display = 'none';
+        }
+      });
+      
+      calculateBtn.addEventListener('click', calculateGST);
+      resetBtn.addEventListener('click', resetCalculator);
+      
+      // Functions
+      function toggleCalculationType() {
+        if (forwardCalc.checked) {
+          amountGroup.style.display = 'block';
+          totalAmountGroup.style.display = 'none';
+        } else {
+          amountGroup.style.display = 'none';
+          totalAmountGroup.style.display = 'block';
+        }
         resultContainer.style.display = 'none';
-        return;
-      } else {
-        errorElement.style.display = 'none';
       }
       
-      const birthDate = new Date(dob);
-      const now = new Date();
+      function validateInputs() {
+        let isValid = true;
+        
+        if (forwardCalc.checked) {
+          if (!amountInput.value || parseFloat(amountInput.value) <= 0) {
+            amountError.style.display = 'block';
+            isValid = false;
+          } else {
+            amountError.style.display = 'none';
+          }
+        } else {
+          if (!totalAmountInput.value || parseFloat(totalAmountInput.value) <= 0) {
+            totalAmountError.style.display = 'block';
+            isValid = false;
+          } else {
+            totalAmountError.style.display = 'none';
+          }
+        }
+        
+        if (isCustomRate && (!gstRateInput.value || parseFloat(gstRateInput.value) < 0 || parseFloat(gstRateInput.value) > 28)) {
+          gstRateError.style.display = 'block';
+          isValid = false;
+        } else {
+          gstRateError.style.display = 'none';
+        }
+        
+        return isValid;
+      }
       
-      // Validate date is not in future
-      if (birthDate > now) {
-        errorElement.style.display = 'block';
+      function calculateGST() {
+        if (!validateInputs()) return;
+        
+        let amount, gstAmountValue, totalAmountValue;
+        const gstType = gstTypeSelect.value;
+        const gstRate = currentGstRate;
+        
+        if (forwardCalc.checked) {
+          // Forward calculation
+          amount = parseFloat(amountInput.value);
+          
+          if (gstType === 'inclusive') {
+            // GST is included in the amount
+            const gstFactor = gstRate / (100 + gstRate);
+            gstAmountValue = amount * gstFactor;
+            totalAmountValue = amount;
+            amount = totalAmountValue - gstAmountValue;
+          } else {
+            // GST is added to the amount
+            gstAmountValue = amount * (gstRate / 100);
+            totalAmountValue = amount + gstAmountValue;
+          }
+        } else {
+          // Reverse calculation
+          totalAmountValue = parseFloat(totalAmountInput.value);
+          
+          if (gstType === 'inclusive') {
+            // GST is included in the total amount
+            const gstFactor = gstRate / (100 + gstRate);
+            gstAmountValue = totalAmountValue * gstFactor;
+            amount = totalAmountValue - gstAmountValue;
+          } else {
+            // Total amount is base amount plus GST
+            amount = totalAmountValue / (1 + (gstRate / 100));
+            gstAmountValue = totalAmountValue - amount;
+          }
+        }
+        
+        // Calculate CGST, SGST, IGST (assuming IGST for simplicity - in real app would depend on state)
+        const cgst = gstAmountValue / 2;
+        const sgst = gstAmountValue / 2;
+        const igst = gstAmountValue;
+        
+        // Update results
+        gstAmount.textContent = formatCurrency(gstAmountValue);
+        totalWithGST.textContent = formatCurrency(totalAmountValue);
+        originalAmount.textContent = formatCurrency(amount);
+        cgstRate.textContent = (gstRate / 2).toFixed(2);
+        cgstAmount.textContent = formatCurrency(cgst);
+        sgstRate.textContent = (gstRate / 2).toFixed(2);
+        sgstAmount.textContent = formatCurrency(sgst);
+        igstRate.textContent = gstRate.toFixed(2);
+        igstAmount.textContent = formatCurrency(igst);
+        finalAmount.textContent = formatCurrency(totalAmountValue);
+        
+        // Show results
+        resultContainer.style.display = 'block';
+      }
+      
+      function formatCurrency(value) {
+        return new Intl.NumberFormat('en-IN', {
+          style: 'currency',
+          currency: 'INR',
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value);
+      }
+      
+      function resetCalculator() {
+        forwardCalc.checked = true;
+        amountGroup.style.display = 'block';
+        totalAmountGroup.style.display = 'none';
+        
+        amountInput.value = '';
+        totalAmountInput.value = '';
+        gstRateInput.value = '';
+        gstRateInput.style.display = 'none';
+        
+        gstSlabs.forEach(slab => slab.classList.remove('active'));
+        document.querySelector('.gst-slab[data-rate="5"]').classList.add('active');
+        currentGstRate = 5;
+        isCustomRate = false;
+        
+        gstTypeSelect.value = 'inclusive';
+        
+        amountError.style.display = 'none';
+        totalAmountError.style.display = 'none';
+        gstRateError.style.display = 'none';
+        
         resultContainer.style.display = 'none';
-        return;
       }
-      
-      // Calculate age in years, months, days
-      let years = now.getFullYear() - birthDate.getFullYear();
-      let months = now.getMonth() - birthDate.getMonth();
-      let days = now.getDate() - birthDate.getDate();
-      
-      // Adjust for negative months or days
-      if (days < 0) {
-        months--;
-        // Get days in previous month
-        const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
-        days += prevMonthLastDay;
-      }
-      
-      if (months < 0) {
-        years--;
-        months += 12;
-      }
-      
-      // Calculate hours
-      const hours = now.getHours();
-      
-      // Calculate next birthday
-      const nextBirthday = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
-      if (nextBirthday < now) {
-        nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
-      }
-      const daysUntilBirthday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
-      
-      // Update UI
-      document.getElementById('years').textContent = years;
-      document.getElementById('months').textContent = months;
-      document.getElementById('days').textContent = days;
-      document.getElementById('hours').textContent = hours;
-      document.getElementById('nextBirthday').textContent = `${daysUntilBirthday} day${daysUntilBirthday !== 1 ? 's' : ''}`;
-      
-      // Show results with animation
-      resultContainer.style.display = 'block';
-      resultContainer.classList.add('fade-in');
-      
-      // Scroll to results
-      resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
+    });
   </script>
 </body>
 </html>
