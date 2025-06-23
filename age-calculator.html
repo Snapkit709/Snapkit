@@ -1,112 +1,379 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Age Calculator</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Age Calculator | Calculate Exact Age</title>
+  <meta name="description" content="Calculate your exact age in years, months, days, hours and minutes. Find out how many days until your next birthday.">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --light: #f8f9ff;
+      --dark: #212529;
+      --gray: #6c757d;
+      --light-gray: #e9ecef;
+      --border-radius: 12px;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
     body {
-      background: #f4f9ff;
-      font-family: Arial, sans-serif;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+      color: var(--dark);
+      line-height: 1.6;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
+      padding: 20px;
     }
-
-    .container {
-      background: #fff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
-      text-align: center;
-      width: 90%;
-      max-width: 400px;
-    }
-
-    h1 {
-      color: #007bff;
-      margin-bottom: 20px;
-    }
-
-    input[type="date"] {
-      padding: 10px;
+    
+    .app-container {
+      max-width: 500px;
       width: 100%;
+      background-color: #fff;
+      border-radius: var(--border-radius);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+    
+    .app-container:hover {
+      transform: translateY(-5px);
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+    
+    .subtitle {
+      font-weight: 300;
+      opacity: 0.9;
+    }
+    
+    .main-content {
+      padding: 30px;
+    }
+    
+    .input-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--dark);
+    }
+    
+    input[type="date"] {
+      width: 100%;
+      padding: 12px 15px;
       font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+      border: 2px solid var(--light-gray);
+      border-radius: var(--border-radius);
+      transition: border-color 0.3s ease;
+    }
+    
+    input[type="date"]:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      border-radius: var(--border-radius);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
       margin-bottom: 20px;
     }
-
-    button {
-      padding: 10px 20px;
-      background-color: #007bff;
-      color: #fff;
-      font-size: 1rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
+    
+    .btn-primary {
+      background: linear-gradient(to right, var(--primary), var(--secondary));
+      color: white;
+      box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
     }
-
-    button:hover {
-      background-color: #0056b3;
+    
+    .btn-primary:hover {
+      background: linear-gradient(to right, var(--primary-dark), var(--secondary));
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
     }
-
-    #result {
+    
+    .result-container {
+      background-color: var(--light);
+      border-radius: var(--border-radius);
+      padding: 20px;
       margin-top: 20px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #333;
+      display: none;
     }
-
-    @media (max-width: 600px) {
-      .container {
+    
+    .result-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: var(--primary);
+      text-align: center;
+    }
+    
+    .age-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+    
+    .stat-card {
+      background-color: white;
+      border-radius: var(--border-radius);
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .stat-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 5px;
+      color: var(--primary);
+    }
+    
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+    
+    .next-birthday {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--light-gray);
+      text-align: center;
+    }
+    
+    .next-birthday-text {
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+    
+    .next-birthday-days {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 5px;
+    }
+    
+    .error {
+      color: #f72585;
+      font-size: 0.9rem;
+      margin-top: 10px;
+      text-align: center;
+      display: none;
+    }
+    
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.8rem;
+      color: var(--gray);
+    }
+    
+    @media (max-width: 768px) {
+      .app-container {
+        margin: 15px auto;
+      }
+      
+      header {
+        padding: 20px 15px;
+      }
+      
+      h1 {
+        font-size: 1.6rem;
+      }
+      
+      .main-content {
         padding: 20px;
       }
+      
+      .age-stats {
+        grid-template-columns: 1fr;
+      }
+    }
+    
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
     }
   </style>
 </head>
 <body>
-
-  <div class="container">
-    <h1>Age Calculator</h1>
-    <input type="date" id="dob" />
-    <button onclick="calculateAge()">Calculate Age</button>
-    <div id="result"></div>
+  <div class="app-container">
+    <header>
+      <h1>Advanced Age Calculator</h1>
+      <p class="subtitle">Calculate your exact age and time until next birthday</p>
+    </header>
+    
+    <div class="main-content">
+      <div class="input-group">
+        <label for="dob"><i class="fas fa-calendar-alt"></i> Date of Birth</label>
+        <input type="date" id="dob" max="">
+      </div>
+      
+      <button id="calculateBtn" class="btn btn-primary">
+        <i class="fas fa-calculator"></i> Calculate Age
+      </button>
+      
+      <div id="error" class="error">
+        Please select a valid date of birth
+      </div>
+      
+      <div id="resultContainer" class="result-container">
+        <div class="result-title">Your Age</div>
+        
+        <div class="age-stats">
+          <div class="stat-card">
+            <div class="stat-value" id="years">0</div>
+            <div class="stat-label">Years</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="months">0</div>
+            <div class="stat-label">Months</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="days">0</div>
+            <div class="stat-label">Days</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="hours">0</div>
+            <div class="stat-label">Hours</div>
+          </div>
+        </div>
+        
+        <div class="next-birthday">
+          <div class="next-birthday-text">Time until your next birthday:</div>
+          <div class="next-birthday-days" id="nextBirthday">0 days</div>
+        </div>
+      </div>
+    </div>
+    
+    <footer>
+      <p>Your data is processed in your browser and never sent to any server.</p>
+      <p>© 2023 Advanced Age Calculator. All rights reserved.</p>
+    </footer>
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set max date to today
+      const dobInput = document.getElementById('dob');
+      const today = new Date().toISOString().split('T')[0];
+      dobInput.max = today;
+      
+      // Calculate age when button is clicked
+      document.getElementById('calculateBtn').addEventListener('click', calculateAge);
+      
+      // Also calculate when Enter is pressed in date input
+      dobInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          calculateAge();
+        }
+      });
+    });
+    
     function calculateAge() {
-      const dob = document.getElementById("dob").value;
+      const dob = document.getElementById('dob').value;
+      const errorElement = document.getElementById('error');
+      const resultContainer = document.getElementById('resultContainer');
+      
+      // Validate input
       if (!dob) {
-        document.getElementById("result").innerText = "Please select your date of birth.";
+        errorElement.style.display = 'block';
+        resultContainer.style.display = 'none';
+        return;
+      } else {
+        errorElement.style.display = 'none';
+      }
+      
+      const birthDate = new Date(dob);
+      const now = new Date();
+      
+      // Validate date is not in future
+      if (birthDate > now) {
+        errorElement.style.display = 'block';
+        resultContainer.style.display = 'none';
         return;
       }
-
-      const birthDate = new Date(dob);
-      const today = new Date();
-
-      let ageYears = today.getFullYear() - birthDate.getFullYear();
-      let ageMonths = today.getMonth() - birthDate.getMonth();
-      let ageDays = today.getDate() - birthDate.getDate();
-
-      if (ageDays < 0) {
-        ageMonths--;
-        ageDays += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+      
+      // Calculate age in years, months, days
+      let years = now.getFullYear() - birthDate.getFullYear();
+      let months = now.getMonth() - birthDate.getMonth();
+      let days = now.getDate() - birthDate.getDate();
+      
+      // Adjust for negative months or days
+      if (days < 0) {
+        months--;
+        // Get days in previous month
+        const prevMonthLastDay = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+        days += prevMonthLastDay;
       }
-
-      if (ageMonths < 0) {
-        ageYears--;
-        ageMonths += 12;
+      
+      if (months < 0) {
+        years--;
+        months += 12;
       }
-
-      document.getElementById("result").innerText = `You are ${ageYears} years, ${ageMonths} months, and ${ageDays} days old.`;
+      
+      // Calculate hours
+      const hours = now.getHours();
+      
+      // Calculate next birthday
+      const nextBirthday = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+      if (nextBirthday < now) {
+        nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+      }
+      const daysUntilBirthday = Math.ceil((nextBirthday - now) / (1000 * 60 * 60 * 24));
+      
+      // Update UI
+      document.getElementById('years').textContent = years;
+      document.getElementById('months').textContent = months;
+      document.getElementById('days').textContent = days;
+      document.getElementById('hours').textContent = hours;
+      document.getElementById('nextBirthday').textContent = `${daysUntilBirthday} day${daysUntilBirthday !== 1 ? 's' : ''}`;
+      
+      // Show results with animation
+      resultContainer.style.display = 'block';
+      resultContainer.classList.add('fade-in');
+      
+      // Scroll to results
+      resultContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   </script>
-
 </body>
 </html>
-
-  
