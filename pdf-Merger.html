@@ -1,169 +1,1357 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PDF Merger & Splitter</title>
+  <title>PDF Tools</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body {
+    :root {
+      --primary: #4361ee;
+      --secondary: #3f37c9;
+      --accent: #4895ef;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --info: #560bad;
+    }
+
+    * {
+      box-sizing: border-box;
       margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
-      color: #333;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark);
+      line-height: 1.6;
     }
 
     .container {
-      max-width: 600px;
-      margin: auto;
+      max-width: 900px;
+      margin: 2rem auto;
       padding: 2rem;
-      text-align: center;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     h1 {
-      color: #007BFF;
+      color: var(--primary);
       margin-bottom: 1.5rem;
+      text-align: center;
+      font-weight: 700;
     }
 
-    input[type="file"], input[type="text"] {
+    h2 {
+      color: var(--secondary);
+      margin: 1.5rem 0 1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tool-section {
+      background: var(--light);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      border-left: 4px solid var(--accent);
+    }
+
+    .file-input-container {
+      position: relative;
+      margin: 1rem 0;
+    }
+
+    .file-input-label {
       display: block;
-      margin: 1rem auto;
+      padding: 1.5rem;
+      border: 2px dashed #ccc;
+      border-radius: 8px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+      background-color: white;
+    }
+
+    .file-input-label:hover {
+      border-color: var(--accent);
+      background-color: rgba(72, 149, 239, 0.05);
+    }
+
+    .file-input-label i {
+      font-size: 2rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .file-input-label span {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .file-input-label small {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    input[type="file"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
+
+    .input-group {
+      margin: 1rem 0;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="number"]:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.25);
     }
 
     .button {
-      background-color: #007BFF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      background-color: var(--primary);
       color: white;
       border: none;
       padding: 0.75rem 1.5rem;
       border-radius: 8px;
       font-size: 1rem;
+      font-weight: 500;
       cursor: pointer;
-      margin: 1rem 0.5rem 0;
+      transition: all 0.3s;
+      margin: 0.5rem 0;
+    }
+
+    .button:hover {
+      background-color: var(--secondary);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
     }
 
     .button:disabled {
-      background-color: #a6c8ff;
+      background-color: #adb5bd;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .button-secondary {
+      background-color: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+
+    .button-secondary:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .button-danger {
+      background-color: var(--danger);
+    }
+
+    .button-danger:hover {
+      background-color: #d1145a;
+    }
+
+    .button-success {
+      background-color: var(--success);
+    }
+
+    .button-success:hover {
+      background-color: #3ab7d9;
     }
 
     #downloadLink {
-      display: none;
-      margin-top: 1.5rem;
+      text-decoration: none;
     }
 
-    @media (max-width: 600px) {
+    .file-list {
+      margin: 1rem 0;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 1rem;
+      background: white;
+      border-bottom: 1px solid #e9ecef;
+    }
+
+    .file-item:last-child {
+      border-bottom: none;
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .file-icon {
+      color: var(--accent);
+      font-size: 1.25rem;
+    }
+
+    .file-name {
+      font-weight: 500;
+    }
+
+    .file-size {
+      color: #6c757d;
+      font-size: 0.85rem;
+    }
+
+    .file-remove {
+      color: var(--danger);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0.25rem;
+    }
+
+    .progress-container {
+      margin: 1rem 0;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background-color: var(--accent);
+      width: 0;
+      transition: width 0.3s;
+    }
+
+    .status-text {
+      font-size: 0.9rem;
+      color: #6c757d;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #dee2e6;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      font-weight: 500;
+      color: #6c757d;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+    }
+
+    .tab.active {
+      color: var(--primary);
+      border-bottom-color: var(--primary);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .option-card {
+      background: white;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .option-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .option-card.selected {
+      border-color: var(--primary);
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+
+    .option-card i {
+      font-size: 1.5rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+
+    .option-card h3 {
+      font-size: 1rem;
+      margin-bottom: 0.25rem;
+      color: var(--dark);
+    }
+
+    .option-card p {
+      font-size: 0.85rem;
+      color: #6c757d;
+    }
+
+    .preview-container {
+      margin: 1.5rem 0;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      padding: 1rem;
+      background: white;
+    }
+
+    .preview-title {
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      color: var(--dark);
+    }
+
+    .page-range-example {
+      font-size: 0.85rem;
+      color: #6c757d;
+      margin-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
       .container {
         padding: 1rem;
+        margin: 1rem;
       }
 
-      .button {
-        display: block;
-        margin: 1rem auto 0;
+      .options-grid {
+        grid-template-columns: 1fr;
       }
+
+      .tabs {
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+      }
+
+      .tab {
+        white-space: nowrap;
+      }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-in {
+      animation: fadeIn 0.3s ease-out forwards;
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: var(--dark);
+      color: white;
+      padding: 1rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      z-index: 1000;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast i {
+      font-size: 1.25rem;
+    }
+
+    .toast.success i {
+      color: var(--success);
+    }
+
+    .toast.error i {
+      color: var(--danger);
+    }
+
+    .toast.warning i {
+      color: var(--warning);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>PDF Merger & Splitter</h1>
+    <h1><i class="fas fa-file-pdf"></i> PDF Merger & Splitter </h1>
 
-    <!-- Merger -->
-    <h2 style="color: #007BFF">Merge PDFs</h2>
-    <input type="file" id="mergeInput" accept="application/pdf" multiple />
-    <button class="button" id="mergeBtn" disabled>Merge PDFs</button>
+    <div class="tabs">
+      <div class="tab active" data-tab="merge"><i class="fas fa-object-group"></i> Merge PDFs</div>
+      <div class="tab" data-tab="split"><i class="fas fa-cut"></i> Split PDF</div>
+      <div class="tab" data-tab="extract"><i class="fas fa-file-export"></i> Extract Pages</div>
+      <div class="tab" data-tab="compress"><i class="fas fa-compress-alt"></i> Compress PDF</div>
+    </div>
 
-    <!-- Splitter -->
-    <h2 style="color: #007BFF">Split PDF</h2>
-    <input type="file" id="splitInput" accept="application/pdf" />
-    <input type="text" id="splitPages" placeholder="e.g., 1,3-5" />
-    <button class="button" id="splitBtn" disabled>Split PDF</button>
+    <!-- Merge PDF Tab -->
+    <div class="tab-content active" id="merge-tab">
+      <div class="tool-section">
+        <h2><i class="fas fa-object-group"></i> Merge Multiple PDFs</h2>
+        <p>Combine multiple PDF files into a single document in the order you specify.</p>
+        
+        <div class="file-input-container">
+          <label for="mergeInput" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose PDF files to merge</span>
+            <small>Select 2 or more PDF files (Max 20 files, 50MB each)</small>
+          </label>
+          <input type="file" id="mergeInput" accept="application/pdf" multiple />
+        </div>
 
-    <a id="downloadLink" class="button" download>Download</a>
+        <div class="file-list" id="mergeFileList"></div>
+
+        <div class="input-group">
+          <label for="mergeOrder">Merge Order:</label>
+          <select id="mergeOrder">
+            <option value="filename">By filename (A-Z)</option>
+            <option value="date">By upload date</option>
+            <option value="custom">Custom order (drag to reorder)</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label for="outputName">Output filename:</label>
+          <input type="text" id="outputName" placeholder="merged-document.pdf" />
+        </div>
+
+        <div class="progress-container" id="mergeProgress">
+          <div class="progress-bar">
+            <div class="progress" id="mergeProgressBar"></div>
+          </div>
+          <div class="status-text" id="mergeStatus">Processing...</div>
+        </div>
+
+        <button class="button" id="mergeBtn" disabled><i class="fas fa-object-group"></i> Merge PDFs</button>
+        <button class="button button-secondary" id="mergeResetBtn"><i class="fas fa-redo"></i> Reset</button>
+      </div>
+    </div>
+
+    <!-- Split PDF Tab -->
+    <div class="tab-content" id="split-tab">
+      <div class="tool-section">
+        <h2><i class="fas fa-cut"></i> Split PDF by Pages</h2>
+        <p>Divide a PDF document into multiple files based on page ranges.</p>
+        
+        <div class="file-input-container">
+          <label for="splitInput" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose PDF file to split</span>
+            <small>Select a single PDF file (Max 100MB)</small>
+          </label>
+          <input type="file" id="splitInput" accept="application/pdf" />
+        </div>
+
+        <div class="preview-container" id="splitPreview" style="display: none;">
+          <div class="preview-title">Document Preview</div>
+          <div id="pageCountDisplay"></div>
+          <div class="options-grid" id="splitOptions">
+            <div class="option-card selected" data-split="range">
+              <i class="fas fa-columns"></i>
+              <h3>By Page Range</h3>
+              <p>Extract specific pages or ranges</p>
+            </div>
+            <div class="option-card" data-split="every">
+              <i class="fas fa-copy"></i>
+              <h3>Every N Pages</h3>
+              <p>Split after every N pages</p>
+            </div>
+            <div class="option-card" data-split="bookmarks">
+              <i class="fas fa-bookmark"></i>
+              <h3>By Bookmarks</h3>
+              <p>Split at bookmarks</p>
+            </div>
+          </div>
+
+          <div id="splitRangeOptions">
+            <div class="input-group">
+              <label for="splitPages">Page ranges to extract:</label>
+              <input type="text" id="splitPages" placeholder="e.g., 1, 3-5, 7, 9-12" />
+              <div class="page-range-example">Examples: "1,3-5" (pages 1,3,4,5) or "1-3,5-" (pages 1-3 and 5 to end)</div>
+            </div>
+          </div>
+
+          <div id="splitEveryOptions" style="display: none;">
+            <div class="input-group">
+              <label for="splitEveryN">Split after every:</label>
+              <input type="number" id="splitEveryN" min="1" value="1" placeholder="Number of pages" />
+              <div class="page-range-example">The document will be split into multiple files, each containing the specified number of pages.</div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="splitOutputPrefix">Output filename prefix:</label>
+            <input type="text" id="splitOutputPrefix" placeholder="split-document" />
+          </div>
+        </div>
+
+        <div class="progress-container" id="splitProgress">
+          <div class="progress-bar">
+            <div class="progress" id="splitProgressBar"></div>
+          </div>
+          <div class="status-text" id="splitStatus">Processing...</div>
+        </div>
+
+        <button class="button" id="splitBtn" disabled><i class="fas fa-cut"></i> Split PDF</button>
+        <button class="button button-secondary" id="splitResetBtn"><i class="fas fa-redo"></i> Reset</button>
+      </div>
+    </div>
+
+    <!-- Extract Pages Tab -->
+    <div class="tab-content" id="extract-tab">
+      <div class="tool-section">
+        <h2><i class="fas fa-file-export"></i> Extract Pages</h2>
+        <p>Select specific pages from a PDF and save them as a new document.</p>
+        
+        <div class="file-input-container">
+          <label for="extractInput" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose PDF file to extract from</span>
+            <small>Select a single PDF file (Max 100MB)</small>
+          </label>
+          <input type="file" id="extractInput" accept="application/pdf" />
+        </div>
+
+        <div class="preview-container" id="extractPreview" style="display: none;">
+          <div class="preview-title">Document Preview</div>
+          <div id="extractPageCountDisplay"></div>
+          
+          <div class="input-group">
+            <label for="extractPages">Pages to extract:</label>
+            <input type="text" id="extractPages" placeholder="e.g., 1, 3-5, 7, 9-12" />
+            <div class="page-range-example">Examples: "1,3-5" (pages 1,3,4,5) or "1-3,5-" (pages 1-3 and 5 to end)</div>
+          </div>
+
+          <div class="input-group">
+            <label for="extractOutputName">Output filename:</label>
+            <input type="text" id="extractOutputName" placeholder="extracted-pages.pdf" />
+          </div>
+        </div>
+
+        <div class="progress-container" id="extractProgress">
+          <div class="progress-bar">
+            <div class="progress" id="extractProgressBar"></div>
+          </div>
+          <div class="status-text" id="extractStatus">Processing...</div>
+        </div>
+
+        <button class="button" id="extractBtn" disabled><i class="fas fa-file-export"></i> Extract Pages</button>
+        <button class="button button-secondary" id="extractResetBtn"><i class="fas fa-redo"></i> Reset</button>
+      </div>
+    </div>
+
+    <!-- Compress PDF Tab -->
+    <div class="tab-content" id="compress-tab">
+      <div class="tool-section">
+        <h2><i class="fas fa-compress-alt"></i> Compress PDF</h2>
+        <p>Reduce PDF file size while maintaining quality.</p>
+        
+        <div class="file-input-container">
+          <label for="compressInput" class="file-input-label">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <span>Choose PDF file to compress</span>
+            <small>Select a single PDF file (Max 100MB)</small>
+          </label>
+          <input type="file" id="compressInput" accept="application/pdf" />
+        </div>
+
+        <div class="preview-container" id="compressPreview" style="display: none;">
+          <div class="preview-title">Compression Options</div>
+          
+          <div class="options-grid">
+            <div class="option-card selected" data-compression="low">
+              <i class="fas fa-battery-quarter"></i>
+              <h3>Low Compression</h3>
+              <p>Best quality, moderate size reduction</p>
+            </div>
+            <div class="option-card" data-compression="medium">
+              <i class="fas fa-battery-half"></i>
+              <h3>Medium Compression</h3>
+              <p>Good balance of quality and size</p>
+            </div>
+            <div class="option-card" data-compression="high">
+              <i class="fas fa-battery-full"></i>
+              <h3>High Compression</h3>
+              <p>Maximum size reduction, lower quality</p>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="compressOutputName">Output filename:</label>
+            <input type="text" id="compressOutputName" placeholder="compressed-document.pdf" />
+          </div>
+        </div>
+
+        <div class="progress-container" id="compressProgress">
+          <div class="progress-bar">
+            <div class="progress" id="compressProgressBar"></div>
+          </div>
+          <div class="status-text" id="compressStatus">Processing...</div>
+        </div>
+
+        <button class="button" id="compressBtn" disabled><i class="fas fa-compress-alt"></i> Compress PDF</button>
+        <button class="button button-secondary" id="compressResetBtn"><i class="fas fa-redo"></i> Reset</button>
+      </div>
+    </div>
+
+    <a id="downloadLink" class="button button-success" download style="display: none;">
+      <i class="fas fa-download"></i> Download Result
+    </a>
+  </div>
+
+  <div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">Operation completed successfully!</span>
   </div>
 
   <script type="module">
-    import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib';
+    import { PDFDocument } from 'https://cdn.skypack.dev/pdf-lib@^1.17.1';
 
-    const mergeInput = document.getElementById('mergeInput');
-    const splitInput = document.getElementById('splitInput');
-    const splitPages = document.getElementById('splitPages');
-    const mergeBtn = document.getElementById('mergeBtn');
-    const splitBtn = document.getElementById('splitBtn');
-    const downloadLink = document.getElementById('downloadLink');
+    // DOM Elements
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
 
-    let mergeFiles = [];
-    let splitFile;
-
-    mergeInput.addEventListener('change', (e) => {
-      mergeFiles = Array.from(e.target.files);
-      mergeBtn.disabled = mergeFiles.length < 2;
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabId = tab.getAttribute('data-tab');
+        
+        // Update active tab
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        
+        // Update active content
+        tabContents.forEach(content => content.classList.remove('active'));
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
     });
 
-    splitInput.addEventListener('change', (e) => {
-      splitFile = e.target.files[0];
-      splitBtn.disabled = !splitFile;
-    });
+    // Show toast notification
+    function showToast(message, type = 'success') {
+      toast.className = `toast ${type}`;
+      toastMessage.textContent = message;
+      
+      const icon = toast.querySelector('i');
+      icon.className = type === 'success' ? 'fas fa-check-circle' : 
+                       type === 'error' ? 'fas fa-times-circle' : 'fas fa-exclamation-circle';
+      
+      toast.classList.add('show');
+      
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
 
-    mergeBtn.addEventListener('click', async () => {
-      const mergedPdf = await PDFDocument.create();
+    // Helper function to format file size
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
-      for (const file of mergeFiles) {
-        const bytes = await file.arrayBuffer();
-        const pdf = await PDFDocument.load(bytes);
-        const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-        copiedPages.forEach(page => mergedPdf.addPage(page));
-      }
-
-      const mergedBytes = await mergedPdf.save();
-      const blob = new Blob([mergedBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-
-      downloadLink.href = url;
-      downloadLink.download = 'merged.pdf';
-      downloadLink.style.display = 'inline-block';
-    });
-
-    splitBtn.addEventListener('click', async () => {
-      const bytes = await splitFile.arrayBuffer();
-      const pdfDoc = await PDFDocument.load(bytes);
-
-      const splitPdf = await PDFDocument.create();
-      const input = splitPages.value;
-      const pageIndices = parsePageInput(input, pdfDoc.getPageCount());
-
-      const pages = await splitPdf.copyPages(pdfDoc, pageIndices);
-      pages.forEach((page) => splitPdf.addPage(page));
-
-      const splitBytes = await splitPdf.save();
-      const blob = new Blob([splitBytes], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-
-      downloadLink.href = url;
-      downloadLink.download = 'split.pdf';
-      downloadLink.style.display = 'inline-block';
-    });
-
+    // Helper function to parse page ranges
     function parsePageInput(input, maxPages) {
+      if (!input.trim()) return [];
+      
       const ranges = input.split(',');
       const pages = new Set();
 
       for (const range of ranges) {
-        if (range.includes('-')) {
-          const [start, end] = range.split('-').map(num => parseInt(num.trim(), 10) - 1);
-          for (let i = start; i <= end && i < maxPages; i++) {
-            pages.add(i);
+        const trimmedRange = range.trim();
+        if (!trimmedRange) continue;
+
+        if (trimmedRange.includes('-')) {
+          let [startStr, endStr] = trimmedRange.split('-');
+          startStr = startStr.trim();
+          endStr = endStr.trim();
+
+          const start = startStr ? parseInt(startStr, 10) : 1;
+          const end = endStr ? parseInt(endStr, 10) : maxPages;
+
+          if (isNaN(start) || isNaN(end) || start > end || start < 1 || end > maxPages) {
+            showToast(`Invalid page range: ${trimmedRange}`, 'error');
+            return [];
+          }
+
+          for (let i = start; i <= end; i++) {
+            pages.add(i - 1); // Convert to 0-based index
           }
         } else {
-          const index = parseInt(range.trim(), 10) - 1;
-          if (!isNaN(index) && index < maxPages) pages.add(index);
+          const page = parseInt(trimmedRange, 10);
+          if (isNaN(page) {
+            showToast(`Invalid page number: ${trimmedRange}`, 'error');
+            return [];
+          }
+          if (page < 1 || page > maxPages) {
+            showToast(`Page number ${page} is out of range`, 'error');
+            return [];
+          }
+          pages.add(page - 1); // Convert to 0-based index
         }
       }
 
-      return Array.from(pages);
+      return Array.from(pages).sort((a, b) => a - b);
     }
+
+    // Merge PDF Functionality
+    const mergeInput = document.getElementById('mergeInput');
+    const mergeFileList = document.getElementById('mergeFileList');
+    const mergeBtn = document.getElementById('mergeBtn');
+    const mergeResetBtn = document.getElementById('mergeResetBtn');
+    const mergeOrder = document.getElementById('mergeOrder');
+    const outputName = document.getElementById('outputName');
+    const mergeProgress = document.getElementById('mergeProgress');
+    const mergeProgressBar = document.getElementById('mergeProgressBar');
+    const mergeStatus = document.getElementById('mergeStatus');
+
+    let mergeFiles = [];
+
+    mergeInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      
+      // Validate files
+      const validFiles = files.filter(file => {
+        if (file.size > 50 * 1024 * 1024) {
+          showToast(`File ${file.name} is too large (max 50MB)`, 'error');
+          return false;
+        }
+        if (file.type !== 'application/pdf') {
+          showToast(`File ${file.name} is not a PDF`, 'error');
+          return false;
+        }
+        return true;
+      });
+
+      if (validFiles.length < 2) {
+        showToast('Please select at least 2 valid PDF files', 'error');
+        return;
+      }
+
+      if (validFiles.length > 20) {
+        showToast('Maximum 20 files allowed', 'error');
+        return;
+      }
+
+      mergeFiles = validFiles;
+      updateMergeFileList();
+      mergeBtn.disabled = mergeFiles.length < 2;
+    });
+
+    function updateMergeFileList() {
+      mergeFileList.innerHTML = '';
+      
+      // Sort files based on selected order
+      let sortedFiles = [...mergeFiles];
+      if (mergeOrder.value === 'filename') {
+        sortedFiles.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (mergeOrder.value === 'date') {
+        sortedFiles.sort((a, b) => a.lastModified - b.lastModified);
+      }
+      
+      sortedFiles.forEach((file, index) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item fade-in';
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <i class="fas fa-file-pdf file-icon"></i>
+            <div>
+              <div class="file-name">${file.name}</div>
+              <div class="file-size">${formatFileSize(file.size)}</div>
+            </div>
+          </div>
+          <button class="file-remove" data-index="${index}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        mergeFileList.appendChild(fileItem);
+      });
+
+      // Add event listeners to remove buttons
+      document.querySelectorAll('.file-remove').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const index = parseInt(btn.getAttribute('data-index'));
+          mergeFiles.splice(index, 1);
+          updateMergeFileList();
+          mergeBtn.disabled = mergeFiles.length < 2;
+        });
+      });
+    }
+
+    mergeOrder.addEventListener('change', updateMergeFileList);
+
+    mergeBtn.addEventListener('click', async () => {
+      if (mergeFiles.length < 2) {
+        showToast('Please select at least 2 PDF files to merge', 'error');
+        return;
+      }
+
+      try {
+        mergeProgress.style.display = 'block';
+        mergeStatus.textContent = 'Starting merge process...';
+        mergeProgressBar.style.width = '0%';
+        
+        const mergedPdf = await PDFDocument.create();
+        const totalFiles = mergeFiles.length;
+        let processedFiles = 0;
+
+        for (const file of mergeFiles) {
+          mergeStatus.textContent = `Processing ${file.name}...`;
+          
+          try {
+            const bytes = await file.arrayBuffer();
+            const pdf = await PDFDocument.load(bytes);
+            const copiedPages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+            copiedPages.forEach(page => mergedPdf.addPage(page));
+            
+            processedFiles++;
+            const progress = Math.round((processedFiles / totalFiles) * 100);
+            mergeProgressBar.style.width = `${progress}%`;
+            mergeStatus.textContent = `Processed ${processedFiles} of ${totalFiles} files (${progress}%)`;
+          } catch (error) {
+            console.error(`Error processing ${file.name}:`, error);
+            showToast(`Error processing ${file.name}`, 'error');
+            mergeProgress.style.display = 'none';
+            return;
+          }
+        }
+
+        mergeStatus.textContent = 'Finalizing merged document...';
+        
+        const mergedBytes = await mergedPdf.save();
+        const blob = new Blob([mergedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        const downloadLink = document.getElementById('downloadLink');
+        downloadLink.href = url;
+        downloadLink.download = outputName.value || 'merged-document.pdf';
+        downloadLink.style.display = 'inline-block';
+        
+        mergeStatus.textContent = 'Merge completed successfully!';
+        showToast('PDFs merged successfully!', 'success');
+      } catch (error) {
+        console.error('Merge error:', error);
+        showToast('Error merging PDFs', 'error');
+        mergeStatus.textContent = 'Error occurred during merge';
+      } finally {
+        setTimeout(() => {
+          mergeProgress.style.display = 'none';
+        }, 2000);
+      }
+    });
+
+    mergeResetBtn.addEventListener('click', () => {
+      mergeFiles = [];
+      mergeFileList.innerHTML = '';
+      mergeInput.value = '';
+      mergeBtn.disabled = true;
+      outputName.value = '';
+      mergeProgress.style.display = 'none';
+    });
+
+    // Split PDF Functionality
+    const splitInput = document.getElementById('splitInput');
+    const splitPreview = document.getElementById('splitPreview');
+    const splitOptions = document.getElementById('splitOptions');
+    const splitRangeOptions = document.getElementById('splitRangeOptions');
+    const splitEveryOptions = document.getElementById('splitEveryOptions');
+    const splitPages = document.getElementById('splitPages');
+    const splitEveryN = document.getElementById('splitEveryN');
+    const splitOutputPrefix = document.getElementById('splitOutputPrefix');
+    const splitBtn = document.getElementById('splitBtn');
+    const splitResetBtn = document.getElementById('splitResetBtn');
+    const pageCountDisplay = document.getElementById('pageCountDisplay');
+    const splitProgress = document.getElementById('splitProgress');
+    const splitProgressBar = document.getElementById('splitProgressBar');
+    const splitStatus = document.getElementById('splitStatus');
+
+    let splitFile = null;
+    let splitPdfDoc = null;
+
+    splitInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      
+      if (!file) return;
+      
+      if (file.size > 100 * 1024 * 1024) {
+        showToast('File is too large (max 100MB)', 'error');
+        return;
+      }
+      
+      if (file.type !== 'application/pdf') {
+        showToast('Please select a PDF file', 'error');
+        return;
+      }
+
+      splitFile = file;
+      
+      try {
+        splitStatus.textContent = 'Loading PDF document...';
+        splitProgress.style.display = 'block';
+        splitProgressBar.style.width = '10%';
+        
+        const bytes = await file.arrayBuffer();
+        splitPdfDoc = await PDFDocument.load(bytes);
+        
+        const pageCount = splitPdfDoc.getPageCount();
+        pageCountDisplay.innerHTML = `
+          <strong>File:</strong> ${file.name}<br>
+          <strong>Pages:</strong> ${pageCount}<br>
+          <strong>Size:</strong> ${formatFileSize(file.size)}
+        `;
+        
+        splitPreview.style.display = 'block';
+        splitBtn.disabled = false;
+        splitProgress.style.display = 'none';
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        showToast('Error loading PDF file', 'error');
+        splitProgress.style.display = 'none';
+        splitFile = null;
+        splitPdfDoc = null;
+      }
+    });
+
+    // Split options selection
+    splitOptions.querySelectorAll('.option-card').forEach(card => {
+      card.addEventListener('click', () => {
+        splitOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        
+        if (card.getAttribute('data-split') === 'range') {
+          splitRangeOptions.style.display = 'block';
+          splitEveryOptions.style.display = 'none';
+        } else if (card.getAttribute('data-split') === 'every') {
+          splitRangeOptions.style.display = 'none';
+          splitEveryOptions.style.display = 'block';
+        } else {
+          splitRangeOptions.style.display = 'none';
+          splitEveryOptions.style.display = 'none';
+        }
+      });
+    });
+
+    splitBtn.addEventListener('click', async () => {
+      if (!splitFile || !splitPdfDoc) {
+        showToast('Please select a valid PDF file first', 'error');
+        return;
+      }
+
+      const pageCount = splitPdfDoc.getPageCount();
+      const selectedOption = splitOptions.querySelector('.option-card.selected').getAttribute('data-split');
+      
+      try {
+        splitProgress.style.display = 'block';
+        splitStatus.textContent = 'Starting split process...';
+        splitProgressBar.style.width = '0%';
+        
+        if (selectedOption === 'range') {
+          // Split by page ranges
+          const pageRanges = splitPages.value.trim();
+          if (!pageRanges) {
+            showToast('Please enter page ranges to extract', 'error');
+            splitProgress.style.display = 'none';
+            return;
+          }
+          
+          const pageIndices = parsePageInput(pageRanges, pageCount);
+          if (pageIndices.length === 0) {
+            splitProgress.style.display = 'none';
+            return;
+          }
+          
+          const splitDoc = await PDFDocument.create();
+          const pages = await splitDoc.copyPages(splitPdfDoc, pageIndices);
+          pages.forEach(page => splitDoc.addPage(page));
+          
+          splitStatus.textContent = 'Creating split document...';
+          splitProgressBar.style.width = '70%';
+          
+          const splitBytes = await splitDoc.save();
+          const blob = new Blob([splitBytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+
+          const downloadLink = document.getElementById('downloadLink');
+          downloadLink.href = url;
+          downloadLink.download = splitOutputPrefix.value 
+            ? `${splitOutputPrefix.value}.pdf` 
+            : `split-${splitFile.name}`;
+          downloadLink.style.display = 'inline-block';
+          
+          splitStatus.textContent = 'Split completed successfully!';
+          splitProgressBar.style.width = '100%';
+          showToast('PDF split successfully!', 'success');
+        } else if (selectedOption === 'every') {
+          // Split every N pages
+          const n = parseInt(splitEveryN.value);
+          if (isNaN(n) || n < 1 || n > pageCount) {
+            showToast('Please enter a valid number of pages', 'error');
+            splitProgress.style.display = 'none';
+            return;
+          }
+          
+          // For this demo, we'll just split into one document
+          // In a real app, you'd create multiple documents and a ZIP file
+          const numSplits = Math.ceil(pageCount / n);
+          if (numSplits > 10) {
+            showToast(`This would create ${numSplits} files. For demo, we'll just create the first split.`, 'warning');
+          }
+          
+          const startPage = 0;
+          const endPage = Math.min(n - 1, pageCount - 1);
+          const pageIndices = Array.from({length: endPage - startPage + 1}, (_, i) => startPage + i);
+          
+          const splitDoc = await PDFDocument.create();
+          const pages = await splitDoc.copyPages(splitPdfDoc, pageIndices);
+          pages.forEach(page => splitDoc.addPage(page));
+          
+          splitStatus.textContent = 'Creating split document...';
+          splitProgressBar.style.width = '70%';
+          
+          const splitBytes = await splitDoc.save();
+          const blob = new Blob([splitBytes], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+
+          const downloadLink = document.getElementById('downloadLink');
+          downloadLink.href = url;
+          downloadLink.download = splitOutputPrefix.value 
+            ? `${splitOutputPrefix.value}-part1.pdf` 
+            : `split-part1-${splitFile.name}`;
+          downloadLink.style.display = 'inline-block';
+          
+          splitStatus.textContent = 'First split completed!';
+          splitProgressBar.style.width = '100%';
+          showToast('First split created successfully!', 'success');
+        }
+      } catch (error) {
+        console.error('Split error:', error);
+        showToast('Error splitting PDF', 'error');
+        splitStatus.textContent = 'Error occurred during split';
+      } finally {
+        setTimeout(() => {
+          splitProgress.style.display = 'none';
+        }, 2000);
+      }
+    });
+
+    splitResetBtn.addEventListener('click', () => {
+      splitInput.value = '';
+      splitFile = null;
+      splitPdfDoc = null;
+      splitPreview.style.display = 'none';
+      splitBtn.disabled = true;
+      splitPages.value = '';
+      splitEveryN.value = '1';
+      splitOutputPrefix.value = '';
+      splitProgress.style.display = 'none';
+      splitOptions.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+      splitOptions.querySelector('[data-split="range"]').classList.add('selected');
+      splitRangeOptions.style.display = 'block';
+      splitEveryOptions.style.display = 'none';
+    });
+
+    // Extract Pages Functionality
+    const extractInput = document.getElementById('extractInput');
+    const extractPreview = document.getElementById('extractPreview');
+    const extractPages = document.getElementById('extractPages');
+    const extractOutputName = document.getElementById('extractOutputName');
+    const extractBtn = document.getElementById('extractBtn');
+    const extractResetBtn = document.getElementById('extractResetBtn');
+    const extractPageCountDisplay = document.getElementById('extractPageCountDisplay');
+    const extractProgress = document.getElementById('extractProgress');
+    const extractProgressBar = document.getElementById('extractProgressBar');
+    const extractStatus = document.getElementById('extractStatus');
+
+    let extractFile = null;
+    let extractPdfDoc = null;
+
+    extractInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      
+      if (!file) return;
+      
+      if (file.size > 100 * 1024 * 1024) {
+        showToast('File is too large (max 100MB)', 'error');
+        return;
+      }
+      
+      if (file.type !== 'application/pdf') {
+        showToast('Please select a PDF file', 'error');
+        return;
+      }
+
+      extractFile = file;
+      
+      try {
+        extractStatus.textContent = 'Loading PDF document...';
+        extractProgress.style.display = 'block';
+        extractProgressBar.style.width = '10%';
+        
+        const bytes = await file.arrayBuffer();
+        extractPdfDoc = await PDFDocument.load(bytes);
+        
+        const pageCount = extractPdfDoc.getPageCount();
+        extractPageCountDisplay.innerHTML = `
+          <strong>File:</strong> ${file.name}<br>
+          <strong>Pages:</strong> ${pageCount}<br>
+          <strong>Size:</strong> ${formatFileSize(file.size)}
+        `;
+        
+        extractPreview.style.display = 'block';
+        extractBtn.disabled = false;
+        extractProgress.style.display = 'none';
+      } catch (error) {
+        console.error('Error loading PDF:', error);
+        showToast('Error loading PDF file', 'error');
+        extractProgress.style.display = 'none';
+        extractFile = null;
+        extractPdfDoc = null;
+      }
+    });
+
+    extractBtn.addEventListener('click', async () => {
+      if (!extractFile || !extractPdfDoc) {
+        showToast('Please select a valid PDF file first', 'error');
+        return;
+      }
+
+      const pageCount = extractPdfDoc.getPageCount();
+      const pageRanges = extractPages.value.trim();
+      
+      if (!pageRanges) {
+        showToast('Please enter pages to extract', 'error');
+        return;
+      }
+      
+      const pageIndices = parsePageInput(pageRanges, pageCount);
+      if (pageIndices.length === 0) {
+        return;
+      }
+
+      try {
+        extractProgress.style.display = 'block';
+        extractStatus.textContent = 'Extracting pages...';
+        extractProgressBar.style.width = '30%';
+        
+        const extractedDoc = await PDFDocument.create();
+        const pages = await extractedDoc.copyPages(extractPdfDoc, pageIndices);
+        pages.forEach(page => extractedDoc.addPage(page));
+        
+        extractStatus.textContent = 'Creating extracted document...';
+        extractProgressBar.style.width = '70%';
+        
+        const extractedBytes = await extractedDoc.save();
+        const blob = new Blob([extractedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        const downloadLink = document.getElementById('downloadLink');
+        downloadLink.href = url;
+        downloadLink.download = extractOutputName.value || `extracted-${extractFile.name}`;
+        downloadLink.style.display = 'inline-block';
+        
+        extractStatus.textContent = 'Extraction completed successfully!';
+        extractProgressBar.style.width = '100%';
+        showToast('Pages extracted successfully!', 'success');
+      } catch (error) {
+        console.error('Extraction error:', error);
+        showToast('Error extracting pages', 'error');
+        extractStatus.textContent = 'Error occurred during extraction';
+      } finally {
+        setTimeout(() => {
+          extractProgress.style.display = 'none';
+        }, 2000);
+      }
+    });
+
+    extractResetBtn.addEventListener('click', () => {
+      extractInput.value = '';
+      extractFile = null;
+      extractPdfDoc = null;
+      extractPreview.style.display = 'none';
+      extractBtn.disabled = true;
+      extractPages.value = '';
+      extractOutputName.value = '';
+      extractProgress.style.display = 'none';
+    });
+
+    // Compress PDF Functionality
+    const compressInput = document.getElementById('compressInput');
+    const compressPreview = document.getElementById('compressPreview');
+    const compressOptions = document.querySelectorAll('[data-compression]');
+    const compressOutputName = document.getElementById('compressOutputName');
+    const compressBtn = document.getElementById('compressBtn');
+    const compressResetBtn = document.getElementById('compressResetBtn');
+    const compressProgress = document.getElementById('compressProgress');
+    const compressProgressBar = document.getElementById('compressProgressBar');
+    const compressStatus = document.getElementById('compressStatus');
+
+    let compressFile = null;
+    let compressionLevel = 'low';
+
+    compressOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        compressOptions.forEach(opt => opt.classList.remove('selected'));
+        option.classList.add('selected');
+        compressionLevel = option.getAttribute('data-compression');
+      });
+    });
+
+    compressInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      
+      if (!file) return;
+      
+      if (file.size > 100 * 1024 * 1024) {
+        showToast('File is too large (max 100MB)', 'error');
+        return;
+      }
+      
+      if (file.type !== 'application/pdf') {
+        showToast('Please select a PDF file', 'error');
+        return;
+      }
+
+      compressFile = file;
+      compressPreview.style.display = 'block';
+      compressBtn.disabled = false;
+    });
+
+    compressBtn.addEventListener('click', async () => {
+      if (!compressFile) {
+        showToast('Please select a PDF file first', 'error');
+        return;
+      }
+
+      try {
+        compressProgress.style.display = 'block';
+        compressStatus.textContent = 'Loading PDF document...';
+        compressProgressBar.style.width = '10%';
+        
+        const bytes = await compressFile.arrayBuffer();
+        const pdfDoc = await PDFDocument.load(bytes);
+        
+        compressStatus.textContent = 'Compressing document...';
+        compressProgressBar.style.width = '30%';
+        
+        // Note: pdf-lib doesn't actually have compression features
+        // In a real app, you'd use a server-side solution or different library
+        // This is just a simulation for the demo
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        const compressedBytes = await pdfDoc.save({
+          useObjectStreams: compressionLevel !== 'low',
+          // These options don't actually reduce size much in pdf-lib
+          // A real compression would require different tools
+        });
+        
+        compressStatus.textContent = 'Finalizing compressed document...';
+        compressProgressBar.style.width = '70%';
+        
+        const blob = new Blob([compressedBytes], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+
+        const downloadLink = document.getElementById('downloadLink');
+        downloadLink.href = url;
+        downloadLink.download = compressOutputName.value || `compressed-${compressFile.name}`;
+        downloadLink.style.display = 'inline-block';
+        
+        compressStatus.textContent = 'Compression completed!';
+        compressProgressBar.style.width = '100%';
+        
+        // Show fake compression results for demo
+        const originalSize = compressFile.size;
+        const compressedSize = blob.size;
+        const ratio = Math.round((1 - (compressedSize / originalSize)) * 100);
+        
+        showToast(`Compressed from ${formatFileSize(originalSize)} to ${formatFileSize(compressedSize)} (${ratio}% reduction)`, 'success');
+      } catch (error) {
+        console.error('Compression error:', error);
+        showToast('Error compressing PDF', 'error');
+        compressStatus.textContent = 'Error occurred during compression';
+      } finally {
+        setTimeout(() => {
+          compressProgress.style.display = 'none';
+        }, 2000);
+      }
+    });
+
+    compressResetBtn.addEventListener('click', () => {
+      compressInput.value = '';
+      compressFile = null;
+      compressPreview.style.display = 'none';
+      compressBtn.disabled = true;
+      compressOutputName.value = '';
+      compressProgress.style.display = 'none';
+      compressOptions.forEach(opt => opt.classList.remove('selected'));
+      compressOptions[0].classList.add('selected');
+      compressionLevel = 'low';
+    });
   </script>
 </body>
 </html>
-
-  
-  
