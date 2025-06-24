@@ -1,123 +1,479 @@
-  
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Image Converter Tool</title>
   <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --secondary: #3b82f6;
+      --light: #f8fafc;
+      --dark: #1e293b;
+      --gray: #64748b;
+      --light-gray: #e2e8f0;
+      --success: #10b981;
+      --error: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      background-color: #ffffff;
-      color: #2563eb;
-      font-family: Arial, sans-serif;
+      background-color: var(--light);
+      color: var(--dark);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
       min-height: 100vh;
       padding: 1rem;
-      box-sizing: border-box;
+      line-height: 1.5;
     }
+
     .container {
-      padding: 2rem;
-      border-radius: 16px;
-      max-width: 500px;
       width: 100%;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      background-color: #ffffff;
+      max-width: 800px;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      padding: 2rem;
+      margin: 2rem 0;
     }
+
+    h1 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .description {
+      color: var(--gray);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .control-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
     input, select, button {
       width: 100%;
-      margin-top: 1rem;
-      padding: 0.5rem;
-      border: 2px solid #2563eb;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--light-gray);
       border-radius: 8px;
       font-size: 1rem;
-      color: #2563eb;
-      background-color: #ffffff;
+      transition: all 0.2s;
     }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+    }
+
     button {
-      background-color: #2563eb;
+      background-color: var(--primary);
       color: white;
+      font-weight: 500;
       cursor: pointer;
+      border: none;
     }
+
     button:hover {
-      background-color: #1e40af;
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
     }
-    img {
+
+    button:disabled {
+      background-color: var(--gray);
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .preview-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .preview-box {
+      border: 2px dashed var(--light-gray);
+      border-radius: 12px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 300px;
+    }
+
+    .preview-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+
+    .preview-image {
       max-width: 100%;
-      margin-top: 1rem;
+      max-height: 250px;
       border-radius: 8px;
+      margin-bottom: 1rem;
+      object-fit: contain;
     }
+
+    .image-info {
+      width: 100%;
+      margin-top: auto;
+      font-size: 0.9rem;
+      color: var(--gray);
+    }
+
     .download-btn {
       display: inline-block;
-      margin-top: 1rem;
-      padding: 0.5rem 1rem;
-      background-color: #2563eb;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--success);
       color: white;
       text-align: center;
       border-radius: 8px;
       text-decoration: none;
+      font-weight: 500;
+      margin-top: 1rem;
+      transition: all 0.2s;
     }
+
     .download-btn:hover {
-      background-color: #1e40af;
+      background-color: #0d9e6e;
+      transform: translateY(-2px);
+    }
+
+    .error-message {
+      color: var(--error);
+      margin-top: 1rem;
+      padding: 0.75rem;
+      background-color: rgba(239, 68, 68, 0.1);
+      border-radius: 8px;
+      display: none;
+    }
+
+    .settings {
+      margin-top: 2rem;
+      padding: 1rem;
+      background-color: var(--light);
+      border-radius: 12px;
+    }
+
+    .settings-title {
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    .setting-group {
+      margin-bottom: 1rem;
+    }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .slider {
+      flex: 1;
+    }
+
+    .slider-value {
+      min-width: 40px;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .preview-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .controls {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Image Converter Tool</h1>
-    <input type="file" id="imageInput" accept="image/*" />
-    <select id="formatSelect">
-      <option value="png">PNG</option>
-      <option value="jpeg">JPG</option>
-      <option value="gif">GIF</option>
-      <option value="webp">WebP</option>
-    </select>
-    <button onclick="convertImage()">Convert Image</button>
+    <h1>Image Converter</h1>
+    <p class="description">Convert images between different formats with quality control and resizing options</p>
 
-    <div id="previewContainer"></div>
+    <div class="controls">
+      <div class="control-group">
+        <label for="imageInput">Select Image</label>
+        <input type="file" id="imageInput" accept="image/*" />
+      </div>
+
+      <div class="control-group">
+        <label for="formatSelect">Output Format</label>
+        <select id="formatSelect">
+          <option value="png">PNG (Lossless)</option>
+          <option value="jpeg">JPEG (Compressed)</option>
+          <option value="webp">WebP (Modern)</option>
+          <option value="gif">GIF (Animation)</option>
+          <option value="bmp">BMP (Uncompressed)</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <button id="convertBtn" onclick="convertImage()" disabled>Convert Image</button>
+      </div>
+    </div>
+
+    <div class="settings">
+      <div class="settings-title">Conversion Settings</div>
+      
+      <div class="setting-group">
+        <label for="qualitySlider">Quality: <span id="qualityValue">80</span>%</label>
+        <div class="slider-container">
+          <input type="range" id="qualitySlider" min="1" max="100" value="80" class="slider">
+          <span class="slider-value" id="qualityValueDisplay">80</span>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <label for="resizeCheckbox">
+          <input type="checkbox" id="resizeCheckbox"> Resize Image
+        </label>
+      </div>
+
+      <div id="resizeSettings" style="display: none;">
+        <div class="setting-group">
+          <label for="widthInput">Width (px)</label>
+          <input type="number" id="widthInput" min="1" placeholder="Original width">
+        </div>
+        <div class="setting-group">
+          <label for="heightInput">Height (px)</label>
+          <input type="number" id="heightInput" min="1" placeholder="Original height">
+        </div>
+        <div class="setting-group">
+          <label for="maintainAspect">
+            <input type="checkbox" id="maintainAspect" checked> Maintain Aspect Ratio
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div id="errorMessage" class="error-message"></div>
+
+    <div class="preview-container">
+      <div class="preview-box">
+        <div class="preview-title">Original Image</div>
+        <img id="originalPreview" class="preview-image" style="display: none;">
+        <div id="originalInfo" class="image-info"></div>
+      </div>
+
+      <div class="preview-box">
+        <div class="preview-title">Converted Image</div>
+        <img id="convertedPreview" class="preview-image" style="display: none;">
+        <div id="convertedInfo" class="image-info"></div>
+        <a id="downloadBtn" class="download-btn" style="display: none;">Download Converted Image</a>
+      </div>
+    </div>
   </div>
 
   <script>
-    let originalFile;
+    // DOM Elements
+    const imageInput = document.getElementById('imageInput');
+    const formatSelect = document.getElementById('formatSelect');
+    const convertBtn = document.getElementById('convertBtn');
+    const qualitySlider = document.getElementById('qualitySlider');
+    const qualityValueDisplay = document.getElementById('qualityValueDisplay');
+    const resizeCheckbox = document.getElementById('resizeCheckbox');
+    const resizeSettings = document.getElementById('resizeSettings');
+    const widthInput = document.getElementById('widthInput');
+    const heightInput = document.getElementById('heightInput');
+    const maintainAspect = document.getElementById('maintainAspect');
+    const errorMessage = document.getElementById('errorMessage');
+    const originalPreview = document.getElementById('originalPreview');
+    const convertedPreview = document.getElementById('convertedPreview');
+    const originalInfo = document.getElementById('originalInfo');
+    const convertedInfo = document.getElementById('convertedInfo');
+    const downloadBtn = document.getElementById('downloadBtn');
 
-    document.getElementById('imageInput').addEventListener('change', function(e) {
-      originalFile = e.target.files[0];
-      const previewContainer = document.getElementById('previewContainer');
-      previewContainer.innerHTML = '<p>Original Preview:</p>' + '<img src="' + URL.createObjectURL(originalFile) + '" alt="Original Image">';
-    });
+    // State
+    let originalFile = null;
+    let originalImage = new Image();
+    let convertedBlob = null;
+
+    // Event Listeners
+    imageInput.addEventListener('change', handleFileSelect);
+    qualitySlider.addEventListener('input', updateQualityDisplay);
+    resizeCheckbox.addEventListener('change', toggleResizeSettings);
+    widthInput.addEventListener('input', handleWidthChange);
+    heightInput.addEventListener('input', handleHeightChange);
+
+    // Functions
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validate file type
+      if (!file.type.match('image.*')) {
+        showError('Please select a valid image file');
+        return;
+      }
+
+      originalFile = file;
+      convertBtn.disabled = false;
+
+      // Display original image preview
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        originalImage.onload = function() {
+          originalPreview.src = event.target.result;
+          originalPreview.style.display = 'block';
+          
+          // Set original dimensions
+          widthInput.placeholder = originalImage.width;
+          heightInput.placeholder = originalImage.height;
+          
+          // Update original image info
+          updateImageInfo(originalInfo, file, originalImage.width, originalImage.height);
+        };
+        originalImage.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
     function convertImage() {
-      if (!originalFile) return alert("Please upload an image first.");
+      if (!originalFile) {
+        showError('Please select an image first');
+        return;
+      }
 
-      const format = document.getElementById("formatSelect").value;
-      const reader = new FileReader();
-      const canvas = document.createElement("canvas");
-      const ctx = canvas.getContext("2d");
-      const img = new Image();
+      const format = formatSelect.value;
+      const quality = parseInt(qualitySlider.value) / 100;
+      const shouldResize = resizeCheckbox.checked;
+      let width = parseInt(widthInput.value) || originalImage.width;
+      let height = parseInt(heightInput.value) || originalImage.height;
 
-      reader.onload = function(event) {
-        img.onload = function() {
-          canvas.width = img.width;
-          canvas.height = img.height;
-          ctx.drawImage(img, 0, 0);
+      // Validate dimensions
+      if (shouldResize && (width <= 0 || height <= 0)) {
+        showError('Please enter valid dimensions');
+        return;
+      }
 
-          canvas.toBlob(function(blob) {
-            const convertedUrl = URL.createObjectURL(blob);
-            const previewContainer = document.getElementById("previewContainer");
-            previewContainer.innerHTML += '<p>Converted Preview:</p>' +
-              '<img src="' + convertedUrl + '" alt="Converted Image">' +
-              '<a class="download-btn" href="' + convertedUrl + '" download="converted-image.' + format + '">Download Converted Image</a>';
-          }, 'image/' + format);
-        };
-        img.src = event.target.result;
-      };
+      // Create canvas
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-      reader.readAsDataURL(originalFile);
+      // Set canvas dimensions
+      if (shouldResize) {
+        canvas.width = width;
+        canvas.height = height;
+      } else {
+        canvas.width = originalImage.width;
+        canvas.height = originalImage.height;
+      }
+
+      // Draw image (with resizing if needed)
+      if (shouldResize) {
+        ctx.drawImage(originalImage, 0, 0, width, height);
+      } else {
+        ctx.drawImage(originalImage, 0, 0);
+      }
+
+      // Convert to selected format
+      canvas.toBlob(function(blob) {
+        if (!blob) {
+          showError('Conversion failed. Please try again.');
+          return;
+        }
+
+        convertedBlob = blob;
+        const convertedUrl = URL.createObjectURL(blob);
+
+        // Display converted image
+        convertedPreview.src = convertedUrl;
+        convertedPreview.style.display = 'block';
+        
+        // Update download button
+        downloadBtn.href = convertedUrl;
+        downloadBtn.download = `converted-image.${format}`;
+        downloadBtn.style.display = 'block';
+        
+        // Update converted image info
+        updateImageInfo(convertedInfo, blob, canvas.width, canvas.height);
+
+        clearError();
+      }, `image/${format}`, quality);
+    }
+
+    function updateQualityDisplay() {
+      qualityValueDisplay.textContent = qualitySlider.value;
+    }
+
+    function toggleResizeSettings() {
+      resizeSettings.style.display = resizeCheckbox.checked ? 'block' : 'none';
+    }
+
+    function handleWidthChange() {
+      if (maintainAspect.checked && originalImage.width && originalImage.height) {
+        const aspectRatio = originalImage.height / originalImage.width;
+        heightInput.value = Math.round(parseInt(widthInput.value) * aspectRatio) || '';
+      }
+    }
+
+    function handleHeightChange() {
+      if (maintainAspect.checked && originalImage.width && originalImage.height) {
+        const aspectRatio = originalImage.width / originalImage.height;
+        widthInput.value = Math.round(parseInt(heightInput.value) * aspectRatio) || '';
+      }
+    }
+
+    function updateImageInfo(element, file, width, height) {
+      const size = file.size ? formatFileSize(file.size) : 'Calculating...';
+      const type = file.type || formatSelect.value;
+      
+      element.innerHTML = `
+        <div>Dimensions: ${width} × ${height} px</div>
+        <div>Format: ${type}</div>
+        <div>Size: ${size}</div>
+      `;
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function showError(message) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = 'block';
+    }
+
+    function clearError() {
+      errorMessage.style.display = 'none';
     }
   </script>
 </body>
 </html>
-  
-  
