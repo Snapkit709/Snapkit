@@ -1,195 +1,534 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Image Rotator/Flipper Tool</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Rotator & Flipper</title>
   <style>
+    :root {
+      --primary-color: #4a6bff;
+      --primary-hover: #3a56d4;
+      --secondary-color: #6c757d;
+      --light-bg: #f8f9fa;
+      --border-color: #dee2e6;
+      --error-color: #dc3545;
+      --success-color: #28a745;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #ffffff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--light-bg);
       color: #333;
       margin: 0;
       padding: 0;
+      line-height: 1.6;
     }
 
     .container {
-      max-width: 600px;
-      margin: 0 auto;
-      text-align: center;
-      padding: 20px;
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     }
 
     h1 {
-      color: #007bff;
+      color: var(--primary-color);
+      text-align: center;
+      margin-bottom: 1.5rem;
     }
 
     .upload-section {
-      margin: 20px 0;
+      border: 2px dashed var(--border-color);
+      border-radius: 8px;
+      padding: 2rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      transition: all 0.3s ease;
+      background-color: rgba(74, 107, 255, 0.05);
+    }
+
+    .upload-section:hover {
+      border-color: var(--primary-color);
+    }
+
+    .upload-section.drag-over {
+      background-color: rgba(74, 107, 255, 0.1);
+      border-color: var(--primary-color);
+    }
+
+    .file-info {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--secondary-color);
     }
 
     .controls {
-      margin: 20px 0;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
     }
 
-    button {
-      background-color: #007bff;
+    .control-group {
+      margin-bottom: 1rem;
+    }
+
+    .button {
+      background-color: var(--primary-color);
       color: white;
       border: none;
-      padding: 10px 20px;
-      margin: 5px;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-size: 1rem;
       cursor: pointer;
-      border-radius: 5px;
-      flex: 1 1 40%;
-      max-width: 180px;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    .button:hover {
+      background-color: var(--primary-hover);
+      transform: translateY(-2px);
     }
 
-    .preview {
-      margin: 20px 0;
-      max-height: 300px;
-      overflow: auto;
-      border: 1px solid #ddd;
-      padding: 10px;
+    .button:disabled {
+      background-color: #a6c8ff;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .button.secondary {
+      background-color: var(--secondary-color);
+    }
+
+    .button.secondary:hover {
+      background-color: #5a6268;
+    }
+
+    .preview-container {
+      position: relative;
+      margin: 1.5rem 0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      min-height: 200px;
+      background-color: #f0f0f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #image-preview {
       max-width: 100%;
-      max-height: 280px;
+      max-height: 400px;
       transition: transform 0.3s ease;
+      display: block;
+      margin: 0 auto;
     }
 
-    .download {
-      margin-top: 20px;
+    .status {
+      padding: 0.75rem;
+      border-radius: 6px;
+      margin-top: 1rem;
+      text-align: center;
+      display: none;
     }
 
-    @media (max-width: 600px) {
+    .error {
+      background-color: rgba(220, 53, 69, 0.1);
+      color: var(--error-color);
+      display: block;
+    }
+
+    .success {
+      background-color: rgba(40, 167, 69, 0.1);
+      color: var(--success-color);
+      display: block;
+    }
+
+    .rotation-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .rotation-slider {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    input[type="range"] {
+      flex: 1;
+    }
+
+    .rotation-value {
+      min-width: 40px;
+      text-align: center;
+    }
+
+    .download-section {
+      margin-top: 1.5rem;
+      text-align: center;
+    }
+
+    #download-link {
+      display: none;
+      text-decoration: none;
+    }
+
+    .image-info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--secondary-color);
+    }
+
+    @media (max-width: 768px) {
       .container {
-        padding: 10px;
+        margin: 1rem;
+        padding: 1rem;
       }
 
-      button {
-        width: 100%;
-        max-width: none;
-        margin-top: 10px;
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .rotation-controls {
+        flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Image Rotator/Flipper Tool</h1>
-    <div class="upload-section">
-      <input type="file" id="image-upload" accept="image/*">
+    <h1> Image Rotator & Flipper</h1>
+    
+    <div class="upload-section" id="dropZone">
+      <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="var(--primary-color)" viewBox="0 0 16 16">
+        <path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"/>
+        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+      </svg>
+      <p>Drag & drop your image here or</p>
+      <button id="uploadBtn" class="button">Choose Image</button>
+      <input type="file" id="image-upload" accept="image/*" style="display: none;" />
+      <div class="file-info" id="fileInfo"></div>
     </div>
+
+    <div class="rotation-controls">
+      <div class="rotation-slider">
+        <span>Rotation:</span>
+        <input type="range" id="rotation-slider" min="-180" max="180" value="0" step="1">
+        <span class="rotation-value" id="rotation-value">0°</span>
+      </div>
+      <button id="reset-rotation" class="button secondary">Reset Rotation</button>
+    </div>
+
     <div class="controls">
-      <button id="rotate-left">Rotate Left</button>
-      <button id="rotate-right">Rotate Right</button>
-      <button id="flip-horizontal">Flip Horizontal</button>
-      <button id="flip-vertical">Flip Vertical</button>
+      <button id="rotate-left" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z"/>
+        </svg>
+        Rotate Left 90°
+      </button>
+      <button id="rotate-right" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+          <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z"/>
+          <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966a.25.25 0 0 1 0 .384l-2.36 1.966A.25.25 0 0 1 8 4.466z"/>
+        </svg>
+        Rotate Right 90°
+      </button>
+      <button id="flip-horizontal" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+          <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/>
+        </svg>
+        Flip Horizontal
+      </button>
+      <button id="flip-vertical" class="button">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+          <path d="M8 16a6 6 0 0 0 6-6c0-1.655-1.122-2.904-2.432-4.362C10.254 4.176 8.75 2.503 8 0c0 0-6 5.686-6 10a6 6 0 0 0 6 6ZM6.646 4.646l.708.708-.707.707-.707-.707.707-.708ZM8 8l-2-2 2-2 2 2-2 2Z"/>
+        </svg>
+        Flip Vertical
+      </button>
     </div>
-    <div class="preview">
+
+    <div class="preview-container">
       <img id="image-preview" src="" alt="Image Preview" />
     </div>
-    <div class="download">
-      <a id="download-link" href="#" download="edited_image.jpg">
-        <button>Download Image</button>
+
+    <div class="image-info" id="imageInfo">
+      <div>Original Size: <span id="original-size">-</span></div>
+      <div>Current Size: <span id="current-size">-</span></div>
+      <div>Format: <span id="image-format">-</span></div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="download-section">
+      <select id="output-format" style="margin-bottom: 1rem; padding: 0.5rem; border-radius: 5px;">
+        <option value="jpeg">JPEG</option>
+        <option value="png">PNG</option>
+        <option value="webp">WebP</option>
+      </select>
+      <a id="download-link" class="button" download="edited_image.jpg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 5px;">
+          <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+          <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+        </svg>
+        Download Image
       </a>
     </div>
   </div>
 
   <script>
-    let imagePreview = document.getElementById('image-preview');
-    let imageUpload = document.getElementById('image-upload');
-    let rotateLeftBtn = document.getElementById('rotate-left');
-    let rotateRightBtn = document.getElementById('rotate-right');
-    let flipHorizontalBtn = document.getElementById('flip-horizontal');
-    let flipVerticalBtn = document.getElementById('flip-vertical');
-    let downloadLink = document.getElementById('download-link');
+    // DOM Elements
+    const uploadBtn = document.getElementById('uploadBtn');
+    const imageUpload = document.getElementById('image-upload');
+    const dropZone = document.getElementById('dropZone');
+    const fileInfo = document.getElementById('fileInfo');
+    const rotateLeftBtn = document.getElementById('rotate-left');
+    const rotateRightBtn = document.getElementById('rotate-right');
+    const flipHorizontalBtn = document.getElementById('flip-horizontal');
+    const flipVerticalBtn = document.getElementById('flip-vertical');
+    const resetRotationBtn = document.getElementById('reset-rotation');
+    const rotationSlider = document.getElementById('rotation-slider');
+    const rotationValue = document.getElementById('rotation-value');
+    const imagePreview = document.getElementById('image-preview');
+    const downloadLink = document.getElementById('download-link');
+    const statusDiv = document.getElementById('status');
+    const outputFormat = document.getElementById('output-format');
+    const originalSizeSpan = document.getElementById('original-size');
+    const currentSizeSpan = document.getElementById('current-size');
+    const imageFormatSpan = document.getElementById('image-format');
 
+    // State variables
     let rotation = 0;
     let flipHorizontal = false;
     let flipVertical = false;
+    let originalImageData = null;
+    let originalWidth = 0;
+    let originalHeight = 0;
 
-    imageUpload.addEventListener('change', (event) => {
-      const file = event.target.files[0];
-      if (file) {
-        let reader = new FileReader();
-        reader.onload = function(e) {
-          imagePreview.src = e.target.result;
-          rotation = 0;
-          flipHorizontal = false;
-          flipVertical = false;
-          imagePreview.style.transform = '';
-        };
-        reader.readAsDataURL(file);
+    // Event Listeners
+    uploadBtn.addEventListener('click', () => imageUpload.click());
+    imageUpload.addEventListener('change', handleFileSelect);
+    dropZone.addEventListener('dragover', handleDragOver);
+    dropZone.addEventListener('dragleave', handleDragLeave);
+    dropZone.addEventListener('drop', handleDrop);
+    rotateLeftBtn.addEventListener('click', () => rotateImage(-90));
+    rotateRightBtn.addEventListener('click', () => rotateImage(90));
+    flipHorizontalBtn.addEventListener('click', toggleFlipHorizontal);
+    flipVerticalBtn.addEventListener('click', toggleFlipVertical);
+    resetRotationBtn.addEventListener('click', resetRotation);
+    rotationSlider.addEventListener('input', updateRotationFromSlider);
+    outputFormat.addEventListener('change', updateDownloadLink);
+
+    // Functions
+    function handleFileSelect(event) {
+      const file = event.target.files[0] || (event.dataTransfer && event.dataTransfer.files[0]);
+      if (!file) return;
+
+      if (!file.type.match('image.*')) {
+        showStatus('Please select an image file.', 'error');
+        return;
       }
-    });
 
-    rotateLeftBtn.addEventListener('click', () => {
-      rotation -= 90;
+      loadImage(file);
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.add('drag-over');
+    }
+
+    function handleDragLeave(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove('drag-over');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.classList.remove('drag-over');
+      imageUpload.files = e.dataTransfer.files;
+      handleFileSelect(e);
+    }
+
+    function loadImage(file) {
+      const reader = new FileReader();
+      
+      reader.onload = function(e) {
+        originalImageData = e.target.result;
+        
+        const img = new Image();
+        img.onload = function() {
+          originalWidth = img.width;
+          originalHeight = img.height;
+          
+          // Display file info
+          fileInfo.textContent = `${file.name} (${originalWidth}×${originalHeight}, ${formatFileSize(file.size)})`;
+          
+          // Reset transformations
+          resetTransformations();
+          imagePreview.src = e.target.result;
+          
+          // Update image info
+          updateImageInfo(file);
+          
+          showStatus('Image loaded successfully.', 'success');
+        };
+        img.src = e.target.result;
+      };
+      
+      reader.onerror = function() {
+        showStatus('Error reading file.', 'error');
+      };
+      
+      reader.readAsDataURL(file);
+    }
+
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    function resetTransformations() {
+      rotation = 0;
+      flipHorizontal = false;
+      flipVertical = false;
+      rotationSlider.value = 0;
+      rotationValue.textContent = '0°';
       updateImage();
-    });
+    }
 
-    rotateRightBtn.addEventListener('click', () => {
-      rotation += 90;
+    function resetRotation() {
+      rotation = 0;
+      rotationSlider.value = 0;
+      rotationValue.textContent = '0°';
       updateImage();
-    });
+    }
 
-    flipHorizontalBtn.addEventListener('click', () => {
+    function rotateImage(degrees) {
+      rotation += degrees;
+      // Keep rotation between -180 and 180 for slider
+      if (rotation > 180) rotation -= 360;
+      if (rotation < -180) rotation += 360;
+      rotationSlider.value = rotation;
+      rotationValue.textContent = `${rotation}°`;
+      updateImage();
+    }
+
+    function updateRotationFromSlider() {
+      rotation = parseInt(rotationSlider.value);
+      rotationValue.textContent = `${rotation}°`;
+      updateImage();
+    }
+
+    function toggleFlipHorizontal() {
       flipHorizontal = !flipHorizontal;
       updateImage();
-    });
+    }
 
-    flipVerticalBtn.addEventListener('click', () => {
+    function toggleFlipVertical() {
       flipVertical = !flipVertical;
       updateImage();
-    });
+    }
 
     function updateImage() {
+      if (!imagePreview.src) return;
+      
       imagePreview.style.transform = `rotate(${rotation}deg)` +
         (flipHorizontal ? ' scaleX(-1)' : '') +
         (flipVertical ? ' scaleY(-1)' : '');
+      
       updateDownloadLink();
+    }
+
+    function updateImageInfo(file) {
+      originalSizeSpan.textContent = `${originalWidth}×${originalHeight}, ${formatFileSize(file.size)}`;
+      imageFormatSpan.textContent = file.type.split('/')[1].toUpperCase();
+      
+      // Update current size (will be same as original initially)
+      currentSizeSpan.textContent = `${originalWidth}×${originalHeight}`;
     }
 
     function updateDownloadLink() {
       if (!imagePreview.src) return;
 
-      let canvas = document.createElement('canvas');
-      let ctx = canvas.getContext('2d');
-      let img = new Image();
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
       img.crossOrigin = "anonymous";
       img.src = imagePreview.src;
 
       img.onload = function() {
+        // Calculate canvas size based on rotation
         let w = img.width;
         let h = img.height;
-
-        if (rotation % 180 !== 0) {
+        
+        if (Math.abs(rotation) % 180 === 90) {
           canvas.width = h;
           canvas.height = w;
         } else {
           canvas.width = w;
           canvas.height = h;
         }
+        
+        // Update current size display
+        currentSizeSpan.textContent = `${canvas.width}×${canvas.height}`;
 
+        // Apply transformations
         ctx.translate(canvas.width / 2, canvas.height / 2);
         ctx.rotate(rotation * Math.PI / 180);
         ctx.scale(flipHorizontal ? -1 : 1, flipVertical ? -1 : 1);
-        ctx.drawImage(img, -w / 2, -h / 2);
+        ctx.drawImage(img, -w / 2, -h / 2, w, h);
 
-        downloadLink.href = canvas.toDataURL("image/jpeg");
+        // Set download link based on selected format
+        const format = outputFormat.value;
+        let mimeType, extension;
+        
+        switch (format) {
+          case 'png':
+            mimeType = 'image/png';
+            extension = 'png';
+            break;
+          case 'webp':
+            mimeType = 'image/webp';
+            extension = 'webp';
+            break;
+          default:
+            mimeType = 'image/jpeg';
+            extension = 'jpg';
+        }
+        
+        downloadLink.href = canvas.toDataURL(mimeType);
+        downloadLink.download = `edited_image.${extension}`;
+        downloadLink.style.display = 'inline-block';
       };
+    }
+
+    function showStatus(message, type) {
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        statusDiv.style.display = 'none';
+      }, 5000);
     }
   </script>
 </body>
 </html>
-  
