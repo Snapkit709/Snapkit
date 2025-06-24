@@ -1,164 +1,582 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Lock Tool</title>
+  <title>PDF Lock/Unlock</title>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/downloadjs@1.4.7"></script>
   <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --secondary: #3f37c9;
+      --success: #4cc9f0;
+      --danger: #f72585;
+      --warning: #f8961e;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f4faff;
-      color: #333;
+      background-color: #f0f2f5;
+      color: var(--dark);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
+      line-height: 1.6;
     }
 
     .container {
       background-color: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(0, 123, 255, 0.1);
-      padding: 2rem;
-      max-width: 450px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+      padding: 2.5rem;
+      max-width: 550px;
       width: 100%;
       text-align: center;
+      transition: all 0.3s ease;
     }
 
     h1 {
-      color: #007BFF;
-      margin-bottom: 1rem;
-      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+      font-weight: 700;
     }
 
-    input[type="file"],
-    input[type="password"] {
-      width: 100%;
-      margin: 0.75rem 0;
-      padding: 0.6rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 10px;
+    .input-group {
+      margin-bottom: 1.25rem;
+      text-align: left;
     }
 
     label {
       font-weight: 600;
       display: block;
-      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      color: var(--dark);
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 0.8rem 1rem;
+      font-size: 1rem;
+      border: 2px solid #e9ecef;
+      border-radius: 10px;
+      transition: all 0.3s;
+    }
+
+    .input-field:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+    }
+
+    .password-strength {
+      height: 4px;
+      background: #e9ecef;
+      border-radius: 2px;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+
+    .strength-bar {
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s, background 0.3s;
+    }
+
+    .options-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .option-item {
+      flex: 1;
+      min-width: 120px;
+    }
+
+    .option-checkbox {
+      display: none;
+    }
+
+    .option-label {
+      display: block;
+      padding: 0.8rem;
+      background: #f8f9fa;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+      border: 2px solid #e9ecef;
+    }
+
+    .option-checkbox:checked + .option-label {
+      background: rgba(67, 97, 238, 0.1);
+      border-color: var(--primary);
+      color: var(--primary);
+      font-weight: 600;
     }
 
     .button {
-      background-color: #007BFF;
+      background-color: var(--primary);
       color: white;
       border: none;
-      padding: 0.75rem 1.5rem;
+      padding: 0.9rem 2rem;
       border-radius: 10px;
       font-size: 1rem;
+      font-weight: 600;
       cursor: pointer;
       margin-top: 1rem;
-      transition: background-color 0.3s;
+      transition: all 0.3s;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
 
     .button:hover {
-      background-color: #0056b3;
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(67, 97, 238, 0.2);
     }
 
     .button:disabled {
-      background-color: #a6c8ff;
+      background-color: #adb5bd;
       cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .button .spinner {
+      display: none;
+      width: 18px;
+      height: 18px;
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .button.loading .spinner {
+      display: inline-block;
     }
 
     #status {
-      margin-top: 1rem;
-      font-weight: bold;
-      color: #007BFF;
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 10px;
+      font-weight: 500;
     }
 
-    #downloadLink {
-      display: none;
-      margin-top: 1.5rem;
-      text-decoration: none;
-      background-color: #28a745;
-      padding: 0.75rem 1.5rem;
+    .status-success {
+      background-color: rgba(76, 201, 240, 0.1);
+      color: #0a9396;
+    }
+
+    .status-error {
+      background-color: rgba(247, 37, 133, 0.1);
+      color: var(--danger);
+    }
+
+    .status-info {
+      background-color: rgba(248, 150, 30, 0.1);
+      color: var(--warning);
+    }
+
+    .file-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8f9fa;
+      padding: 0.8rem 1rem;
       border-radius: 10px;
-      color: #fff;
+      margin-top: 0.5rem;
+    }
+
+    .file-name {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 70%;
+    }
+
+    .file-size {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .remove-file {
+      background: none;
+      border: none;
+      color: var(--danger);
+      cursor: pointer;
       font-weight: bold;
-      display: inline-block;
+      margin-left: 0.5rem;
+    }
+
+    .progress-container {
+      width: 100%;
+      background: #e9ecef;
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--primary);
+      width: 0%;
+      transition: width 0.3s ease;
     }
 
     @media (max-width: 600px) {
       .container {
-        padding: 1rem;
+        padding: 1.5rem;
         margin: 1rem;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .options-group {
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .option-item {
+        min-width: 100%;
       }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>PDF Lock Tool</h1>
-    <input type="file" id="pdfInput" accept="application/pdf" />
+    <h1>PDF Lock/Unlock</h1>
+    
+    <div class="input-group">
+      <label for="pdfInput">Select PDF File</label>
+      <input type="file" id="pdfInput" class="input-field" accept="application/pdf" />
+      <div id="fileInfo" style="display: none;">
+        <div class="file-info">
+          <span class="file-name" id="fileName"></span>
+          <span class="file-size" id="fileSize"></span>
+          <button class="remove-file" id="removeFile">×</button>
+        </div>
+      </div>
+    </div>
 
-    <label for="password">Set Password:</label>
-    <input type="password" id="password" placeholder="Enter password to lock PDF" />
+    <div class="input-group">
+      <label for="password">Set Password</label>
+      <input type="password" id="password" class="input-field" placeholder="Enter a strong password" />
+      <div class="password-strength">
+        <div class="strength-bar" id="strengthBar"></div>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--gray); margin-top: 0.25rem;">
+        Password strength: <span id="strengthText">None</span>
+      </div>
+    </div>
 
-    <button class="button" id="lockBtn" disabled>Lock PDF</button>
-    <div id="status"></div>
-    <a id="downloadLink" download>Download Locked PDF</a>
+    <div class="input-group">
+      <label for="confirmPassword">Confirm Password</label>
+      <input type="password" id="confirmPassword" class="input-field" placeholder="Re-enter your password" />
+      <div id="passwordMatch" style="font-size: 0.8rem; margin-top: 0.25rem;"></div>
+    </div>
+
+    <div class="options-group">
+      <div class="option-item">
+        <input type="checkbox" id="preventPrinting" class="option-checkbox" checked>
+        <label for="preventPrinting" class="option-label">No Printing</label>
+      </div>
+      <div class="option-item">
+        <input type="checkbox" id="preventCopying" class="option-checkbox" checked>
+        <label for="preventCopying" class="option-label">No Copying</label>
+      </div>
+      <div class="option-item">
+        <input type="checkbox" id="preventModifying" class="option-checkbox" checked>
+        <label for="preventModifying" class="option-label">No Editing</label>
+      </div>
+    </div>
+
+    <div class="progress-container" id="progressContainer">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <button class="button" id="lockBtn" disabled>
+      <span class="spinner"></span>
+      <span id="buttonText">Lock PDF</span>
+    </button>
+
+    <div id="status" style="display: none;"></div>
   </div>
 
   <script>
+    // DOM Elements
     const pdfInput = document.getElementById('pdfInput');
     const lockBtn = document.getElementById('lockBtn');
-    const downloadLink = document.getElementById('downloadLink');
     const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
     const status = document.getElementById('status');
+    const fileInfo = document.getElementById('fileInfo');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFile = document.getElementById('removeFile');
+    const strengthBar = document.getElementById('strengthBar');
+    const strengthText = document.getElementById('strengthText');
+    const passwordMatch = document.getElementById('passwordMatch');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const buttonText = document.getElementById('buttonText');
+    const preventPrinting = document.getElementById('preventPrinting');
+    const preventCopying = document.getElementById('preventCopying');
+    const preventModifying = document.getElementById('preventModifying');
 
-    let pdfFile;
+    // State variables
+    let pdfFile = null;
+    let isProcessing = false;
 
-    pdfInput.addEventListener('change', (e) => {
-      pdfFile = e.target.files[0];
-      lockBtn.disabled = !pdfFile;
-    });
+    // Event Listeners
+    pdfInput.addEventListener('change', handleFileSelect);
+    removeFile.addEventListener('click', resetFileInput);
+    passwordInput.addEventListener('input', checkPasswordStrength);
+    confirmPasswordInput.addEventListener('input', checkPasswordMatch);
+    lockBtn.addEventListener('click', processPdf);
 
-    lockBtn.addEventListener('click', async () => {
-      if (!pdfFile) return;
-      const password = passwordInput.value;
-      if (!password) {
-        alert('Please enter a password to lock the PDF.');
+    // Functions
+    function handleFileSelect(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Check if file is PDF
+      if (!file.type.includes('pdf')) {
+        showStatus('Please select a valid PDF file', 'error');
+        resetFileInput();
         return;
       }
 
-      status.textContent = 'Processing...';
+      // Check file size (limit to 20MB)
+      if (file.size > 20 * 1024 * 1024) {
+        showStatus('File size exceeds 20MB limit', 'error');
+        resetFileInput();
+        return;
+      }
 
-      const reader = new FileReader();
-      reader.onload = async function (e) {
-        try {
-          const existingPdfBytes = e.target.result;
+      pdfFile = file;
+      updateFileInfo(file);
+      updateLockButtonState();
+    }
 
-          // Simulate encryption as pdf-lib doesn't support it natively
-          const blob = new Blob([existingPdfBytes], { type: 'application/pdf' });
-          const filename = pdfFile.name.replace(/\.pdf$/i, '') + '_locked_simulated.pdf';
+    function resetFileInput() {
+      pdfInput.value = '';
+      pdfFile = null;
+      fileInfo.style.display = 'none';
+      updateLockButtonState();
+    }
 
-          const url = URL.createObjectURL(blob);
+    function updateFileInfo(file) {
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      fileInfo.style.display = 'block';
+    }
 
-          downloadLink.href = url;
-          downloadLink.download = filename;
-          downloadLink.style.display = 'inline-block';
-          status.textContent = 'PDF is ready (Note: Lock is simulated in frontend).';
-        } catch (err) {
-          console.error(err);
-          status.textContent = 'Failed to process PDF.';
-        }
-      };
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
-      reader.readAsArrayBuffer(pdfFile);
-    });
+    function checkPasswordStrength() {
+      const password = passwordInput.value;
+      let strength = 0;
+      
+      // Length check
+      if (password.length > 0) strength += 1;
+      if (password.length >= 8) strength += 1;
+      
+      // Complexity checks
+      if (/[A-Z]/.test(password)) strength += 1;
+      if (/[0-9]/.test(password)) strength += 1;
+      if (/[^A-Za-z0-9]/.test(password)) strength += 1;
+      
+      // Update UI
+      const strengthPercent = (strength / 5) * 100;
+      strengthBar.style.width = `${strengthPercent}%`;
+      
+      // Set color and text based on strength
+      let color, text;
+      if (strength <= 1) {
+        color = '#dc3545';
+        text = 'Weak';
+      } else if (strength <= 3) {
+        color = '#fd7e14';
+        text = 'Moderate';
+      } else {
+        color = '#28a745';
+        text = 'Strong';
+      }
+      
+      strengthBar.style.backgroundColor = color;
+      strengthText.textContent = text;
+      strengthText.style.color = color;
+      
+      // Check password match if confirm field has value
+      if (confirmPasswordInput.value) {
+        checkPasswordMatch();
+      }
+      
+      updateLockButtonState();
+    }
+
+    function checkPasswordMatch() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (!confirmPassword) {
+        passwordMatch.textContent = '';
+        passwordMatch.style.color = '';
+        return;
+      }
+      
+      if (password === confirmPassword) {
+        passwordMatch.textContent = 'Passwords match';
+        passwordMatch.style.color = '#28a745';
+      } else {
+        passwordMatch.textContent = 'Passwords do not match';
+        passwordMatch.style.color = '#dc3545';
+      }
+      
+      updateLockButtonState();
+    }
+
+    function updateLockButtonState() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      const passwordsMatch = password === confirmPassword;
+      const passwordValid = password.length >= 6;
+      
+      lockBtn.disabled = !pdfFile || !passwordValid || !passwordsMatch || isProcessing;
+    }
+
+    async function processPdf() {
+      if (!pdfFile || isProcessing) return;
+      
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (password !== confirmPassword) {
+        showStatus('Passwords do not match', 'error');
+        return;
+      }
+      
+      if (password.length < 6) {
+        showStatus('Password must be at least 6 characters', 'error');
+        return;
+      }
+      
+      try {
+        isProcessing = true;
+        updateUIForProcessing(true);
+        showStatus('Processing PDF...', 'info');
+        progressContainer.style.display = 'block';
+        
+        // Simulate progress (in a real app, you'd update this based on actual progress)
+        let progress = 0;
+        const progressInterval = setInterval(() => {
+          progress += 5;
+          if (progress > 90) clearInterval(progressInterval);
+          progressBar.style.width = `${progress}%`;
+        }, 200);
+        
+        // Load the PDF
+        const arrayBuffer = await readFileAsArrayBuffer(pdfFile);
+        progressBar.style.width = '30%';
+        
+        const { PDFDocument } = PDFLib;
+        const pdfDoc = await PDFDocument.load(arrayBuffer);
+        progressBar.style.width = '60%';
+        
+        // Set permissions
+        const permissions = {
+          printing: preventPrinting.checked ? 'lowResolution' : 'highResolution',
+          copying: !preventCopying.checked,
+          modifying: !preventModifying.checked,
+          annotating: !preventModifying.checked,
+          fillingForms: !preventModifying.checked,
+          contentAccessibility: !preventCopying.checked,
+          documentAssembly: !preventModifying.checked
+        };
+        
+        // Encrypt the PDF
+        await pdfDoc.encrypt({
+          userPassword: password,
+          ownerPassword: password + '_owner', // Different owner password
+          permissions: permissions
+        });
+        progressBar.style.width = '90%';
+        
+        // Save the encrypted PDF
+        const encryptedPdfBytes = await pdfDoc.save();
+        progressBar.style.width = '100%';
+        
+        // Create download
+        const filename = pdfFile.name.replace(/\.pdf$/i, '') + '_secured.pdf';
+        download(encryptedPdfBytes, filename, 'application/pdf');
+        
+        showStatus('PDF successfully secured and ready for download', 'success');
+        clearInterval(progressInterval);
+      } catch (error) {
+        console.error('Error processing PDF:', error);
+        showStatus(`Error: ${error.message}`, 'error');
+      } finally {
+        isProcessing = false;
+        updateUIForProcessing(false);
+      }
+    }
+
+    function readFileAsArrayBuffer(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+      });
+    }
+
+    function updateUIForProcessing(processing) {
+      if (processing) {
+        lockBtn.classList.add('loading');
+        lockBtn.disabled = true;
+        buttonText.textContent = 'Processing...';
+      } else {
+        lockBtn.classList.remove('loading');
+        buttonText.textContent = 'Lock PDF';
+        updateLockButtonState();
+      }
+    }
+
+    function showStatus(message, type) {
+      status.textContent = message;
+      status.className = '';
+      status.classList.add(`status-${type}`);
+      status.style.display = 'block';
+    }
+
+    // Initialize
+    updateLockButtonState();
   </script>
 </body>
 </html>
-
-  
-  
