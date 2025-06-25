@@ -1,104 +1,1028 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Base64 Encoder/Decoder</title>
   <style>
+    :root {
+      --primary: #4a6fa5;
+      --secondary: #166088;
+      --dark: #0a1128;
+      --light: #f5f5f5;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: #f0f8ff;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
       padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    h1 {
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .tab-container {
+      margin-bottom: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      background-color: #eee;
+    }
+    
+    .tab.active {
+      background-color: white;
+      border-color: #ddd;
+      border-bottom-color: white;
+      margin-bottom: -1px;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .input-area {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      margin-bottom: 20px;
     }
-
-    h2 {
-      color: #007bff;
-      text-align: center;
+    
+    .input-box {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      resize: vertical;
+      background-color: #fafafa;
     }
-
-    .content-box {
-      width: 90%;
-      max-width: 600px;
-      min-height: 120px;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      background: #fff;
-      font-size: 16px;
-      margin-bottom: 15px;
-      white-space: pre-wrap;
-      overflow-y: auto;
+    
+    .input-box:focus {
       outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
     }
-
+    
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
     button {
-      padding: 10px 20px;
-      font-size: 16px;
-      margin: 5px;
-      border: none;
-      border-radius: 8px;
-      background-color: #007bff;
+      background-color: var(--primary);
       color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
       cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-
+    
     button:hover {
-      background-color: #0056b3;
+      background-color: var(--secondary);
+      transform: translateY(-2px);
     }
-
-    #output {
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button.success {
+      background-color: var(--success);
+    }
+    
+    button.warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    button.danger {
+      background-color: var(--danger);
+    }
+    
+    button.info {
+      background-color: var(--info);
+    }
+    
+    .file-input {
+      display: none;
+    }
+    
+    .file-label {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: var(--info);
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .file-label:hover {
+      background-color: #138496;
+    }
+    
+    .result-area {
       margin-top: 20px;
-      width: 90%;
-      max-width: 600px;
-      background: #e9f7ff;
-      padding: 10px;
-      border-radius: 10px;
+    }
+    
+    .result-box {
+      width: 100%;
+      min-height: 150px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #e9f7ff;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
       white-space: pre-wrap;
       word-break: break-all;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .copy-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--success);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .copy-notification.show {
+      opacity: 1;
+    }
+    
+    .settings-panel {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .setting-option {
+      margin-bottom: 15px;
+    }
+    
+    .setting-option label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    
+    .setting-option input[type="checkbox"] {
+      margin-right: 10px;
+    }
+    
+    .error-message {
+      color: var(--danger);
+      background-color: #fdecea;
+      padding: 10px;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    
+    .file-info {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      font-size: 14px;
+    }
+    
+    @media (max-width: 600px) {
+      .button-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h2>Base64 Encoder / Decoder</h2>
-
-  <div id="inputBox" class="content-box" contenteditable="true" placeholder="Enter text here..."></div>
-
-  <div>
-    <button onclick="encodeBase64()">Encode</button>
-    <button onclick="decodeBase64()">Decode</button>
+  <div class="container">
+    <header>
+      <h1>Base64 Encoder/Decoder</h1>
+      <p class="description">
+        Encode text or files to Base64, or decode Base64 back to original format.
+        Supports text, images, and other file types.
+      </p>
+    </header>
+    
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="encoder">Encoder/Decoder</div>
+        <div class="tab" data-tab="file-handler">File Handler</div>
+        <div class="tab" data-tab="settings">Settings</div>
+      </div>
+    </div>
+    
+    <div class="tab-content active" id="encoder">
+      <div class="input-area">
+        <textarea id="textInput" class="input-box" placeholder="Enter text to encode or Base64 to decode..."></textarea>
+        <div class="stats">
+          <span id="input-length">Length: 0 characters</span>
+          <span id="input-lines">Lines: 1</span>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="encodeText()" class="success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2h10v10M22 2L12 12"></path>
+          </svg>
+          Encode Text
+        </button>
+        <button onclick="decodeText()" class="warning">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12h20M12 2v20M22 12l-10 10L2 12"></path>
+          </svg>
+          Decode Text
+        </button>
+        <button onclick="encodeURL()" class="info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2h10v10M22 2L12 12"></path>
+          </svg>
+          Encode URL
+        </button>
+        <button onclick="decodeURL()" class="info">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12h20M12 2v20M22 12l-10 10L2 12"></path>
+          </svg>
+          Decode URL
+        </button>
+        <button onclick="clearAll()" class="danger">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear All
+        </button>
+      </div>
+      
+      <div class="result-area">
+        <div class="button-group">
+          <button onclick="copyResult()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy Result
+          </button>
+          <button onclick="swapInputOutput()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+            Swap
+          </button>
+          <button onclick="downloadResult()" class="success">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Download
+          </button>
+        </div>
+        
+        <div id="result" class="result-box"></div>
+        <div class="stats">
+          <span id="result-length">Length: 0 characters</span>
+          <span id="result-lines">Lines: 0</span>
+          <span id="result-type">Type: None</span>
+        </div>
+      </div>
+      
+      <div id="error-container" style="display: none;">
+        <div class="error-message"></div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="file-handler">
+      <div class="input-area">
+        <input type="file" id="fileInput" class="file-input">
+        <label for="fileInput" class="file-label">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          Choose File
+        </label>
+        <div id="file-info" class="file-info" style="display: none;">
+          <strong>Selected File:</strong> <span id="file-name"></span>
+          <span id="file-size"></span>
+          <span id="file-type"></span>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="encodeFile()" class="success">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2h10v10M22 2L12 12"></path>
+          </svg>
+          Encode File
+        </button>
+        <button onclick="decodeFile()" class="warning">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12h20M12 2v20M22 12l-10 10L2 12"></path>
+          </svg>
+          Decode to File
+        </button>
+        <button onclick="clearFile()" class="danger">
+          Clear
+        </button>
+      </div>
+      
+      <div id="file-result" class="result-area" style="display: none;">
+        <div class="button-group">
+          <button onclick="copyFileResult()">
+            Copy Result
+          </button>
+          <button onclick="downloadFileResult()" class="success">
+            Download
+          </button>
+        </div>
+        
+        <div id="file-result-box" class="result-box"></div>
+        <div class="stats">
+          <span id="file-result-length">Length: 0 characters</span>
+          <span id="file-result-type">Type: None</span>
+        </div>
+      </div>
+      
+      <div id="file-preview" style="margin-top: 20px; display: none;">
+        <h3>File Preview</h3>
+        <div id="preview-content" style="max-width: 100%; overflow: auto;"></div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="settings">
+      <div class="settings-panel">
+        <h3>Application Settings</h3>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="auto-copy" checked>
+            Auto-copy results to clipboard
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="auto-clear">
+            Auto-clear input after processing
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="dark-mode">
+            Dark mode
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="show-stats" checked>
+            Show statistics
+          </label>
+        </div>
+      </div>
+      
+      <div class="settings-panel">
+        <h3>Encoding Settings</h3>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="preserve-linebreaks" checked>
+            Preserve line breaks when possible
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="show-encoding-type" checked>
+            Show encoding type in results
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="auto-preview" checked>
+            Auto-preview files when possible
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div id="output"></div>
-
+  
+  <div class="copy-notification" id="copy-notification">
+    Copied to clipboard!
+  </div>
+  
   <script>
-    function encodeBase64() {
-      const input = document.getElementById("inputBox").innerText.trim();
+    // DOM Elements
+    const textInput = document.getElementById('textInput');
+    const resultBox = document.getElementById('result');
+    const inputLength = document.getElementById('input-length');
+    const inputLines = document.getElementById('input-lines');
+    const resultLength = document.getElementById('result-length');
+    const resultLines = document.getElementById('result-lines');
+    const resultType = document.getElementById('result-type');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.querySelector('.error-message');
+    const copyNotification = document.getElementById('copy-notification');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('file-info');
+    const fileName = document.getElementById('file-name');
+    const fileSize = document.getElementById('file-size');
+    const fileType = document.getElementById('file-type');
+    const fileResult = document.getElementById('file-result');
+    const fileResultBox = document.getElementById('file-result-box');
+    const fileResultLength = document.getElementById('file-result-length');
+    const fileResultType = document.getElementById('file-result-type');
+    const previewContent = document.getElementById('file-preview');
+    
+    // Settings elements
+    const autoCopy = document.getElementById('auto-copy');
+    const autoClear = document.getElementById('auto-clear');
+    const darkMode = document.getElementById('dark-mode');
+    const showStats = document.getElementById('show-stats');
+    const preserveLinebreaks = document.getElementById('preserve-linebreaks');
+    const showEncodingType = document.getElementById('show-encoding-type');
+    const autoPreview = document.getElementById('auto-preview');
+    
+    // Variables
+    let currentFile = null;
+    let currentFileType = '';
+    
+    // Event Listeners
+    textInput.addEventListener('input', updateInputStats);
+    fileInput.addEventListener('change', handleFileSelect);
+    
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Settings change listeners
+    darkMode.addEventListener('change', toggleDarkMode);
+    showStats.addEventListener('change', toggleStatsVisibility);
+    
+    // Initialize
+    updateInputStats();
+    loadSettings();
+    
+    // Main Functions
+    function encodeText() {
       try {
+        const input = textInput.value;
+        if (!input.trim()) {
+          showError('Please enter some text to encode.');
+          return;
+        }
+        
         const encoded = btoa(unescape(encodeURIComponent(input)));
-        document.getElementById("output").innerText = "Encoded Base64:\n" + encoded;
+        showResult(encoded, 'Base64 Encoded Text');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) textInput.value = '';
       } catch (e) {
-        document.getElementById("output").innerText = "Error encoding text.";
+        showError('Error encoding text: ' + e.message);
       }
     }
-
-    function decodeBase64() {
-      const input = document.getElementById("inputBox").innerText.trim();
+    
+    function decodeText() {
       try {
+        const input = textInput.value.trim();
+        if (!input) {
+          showError('Please enter Base64 to decode.');
+          return;
+        }
+        
         const decoded = decodeURIComponent(escape(atob(input)));
-        document.getElementById("output").innerText = "Decoded Text:\n" + decoded;
+        showResult(decoded, 'Base64 Decoded Text');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) textInput.value = '';
       } catch (e) {
-        document.getElementById("output").innerText = "Invalid Base64 string.";
+        showError('Error decoding text - invalid Base64: ' + e.message);
+      }
+    }
+    
+    function encodeURL() {
+      try {
+        const input = textInput.value;
+        if (!input.trim()) {
+          showError('Please enter a URL to encode.');
+          return;
+        }
+        
+        const encoded = btoa(unescape(encodeURIComponent(input)));
+        showResult(encoded, 'Base64 Encoded URL');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) textInput.value = '';
+      } catch (e) {
+        showError('Error encoding URL: ' + e.message);
+      }
+    }
+    
+    function decodeURL() {
+      try {
+        const input = textInput.value.trim();
+        if (!input) {
+          showError('Please enter Base64 to decode as URL.');
+          return;
+        }
+        
+        const decoded = decodeURIComponent(escape(atob(input)));
+        showResult(decoded, 'Base64 Decoded URL');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) textInput.value = '';
+      } catch (e) {
+        showError('Error decoding URL - invalid Base64: ' + e.message);
+      }
+    }
+    
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      
+      currentFile = file;
+      currentFileType = file.type;
+      
+      fileName.textContent = file.name;
+      fileSize.textContent = ` (${formatFileSize(file.size)})`;
+      fileType.textContent = ` | Type: ${file.type || 'unknown'}`;
+      
+      fileInfo.style.display = 'block';
+      fileResult.style.display = 'none';
+      previewContent.style.display = 'none';
+      
+      // Auto-preview if enabled
+      if (autoPreview.checked) {
+        previewFile(file);
+      }
+    }
+    
+    function previewFile(file) {
+      const reader = new FileReader();
+      
+      if (file.type.startsWith('image/')) {
+        reader.onload = function(e) {
+          previewContent.style.display = 'block';
+          previewContent.innerHTML = `
+            <h3>Image Preview</h3>
+            <img src="${e.target.result}" style="max-width: 100%; max-height: 300px;" alt="Preview">
+          `;
+        };
+        reader.readAsDataURL(file);
+      } else if (file.type.startsWith('text/') || 
+                 file.type === 'application/json') {
+        reader.onload = function(e) {
+          previewContent.style.display = 'block';
+          previewContent.innerHTML = `
+            <h3>Text Preview (first 500 characters)</h3>
+            <div class="result-box">${e.target.result.substring(0, 500)}</div>
+          `;
+        };
+        reader.readAsText(file);
+      } else {
+        previewContent.style.display = 'block';
+        previewContent.innerHTML = `
+          <h3>No preview available for this file type</h3>
+          <p>File type: ${file.type || 'unknown'}</p>
+        `;
+      }
+    }
+    
+    function encodeFile() {
+      if (!currentFile) {
+        showError('Please select a file first.');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          // For text files, use text encoding
+          if (currentFile.type.startsWith('text/') || 
+              currentFile.type === 'application/json') {
+            const encoded = btoa(unescape(encodeURIComponent(e.target.result)));
+            showFileResult(encoded, 'Base64 Encoded File');
+          } else {
+            // For binary files, use direct Base64 encoding
+            const base64String = e.target.result.split(',')[1];
+            showFileResult(base64String, 'Base64 Encoded File');
+          }
+        } catch (e) {
+          showError('Error encoding file: ' + e.message);
+        }
+      };
+      
+      if (currentFile.type.startsWith('text/') || 
+          currentFile.type === 'application/json') {
+        reader.readAsText(currentFile);
+      } else {
+        reader.readAsDataURL(currentFile);
+      }
+    }
+    
+    function decodeFile() {
+      const input = textInput.value.trim();
+      if (!input) {
+        showError('Please enter Base64 to decode as a file.');
+        return;
+      }
+      
+      try {
+        // Determine file type from Base64 prefix if available
+        let fileType = '';
+        let binaryString = '';
+        
+        if (input.startsWith('data:')) {
+          // Data URL format
+          const matches = input.match(/^data:(.+?);base64,(.*)$/);
+          if (matches && matches.length === 3) {
+            fileType = matches[1];
+            binaryString = atob(matches[2]);
+          } else {
+            throw new Error('Invalid data URL format');
+          }
+        } else {
+          // Plain Base64
+          binaryString = atob(input);
+        }
+        
+        // Create a Blob with the decoded data
+        const byteArray = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+          byteArray[i] = binaryString.charCodeAt(i);
+        }
+        
+        const blob = new Blob([byteArray], { type: fileType });
+        const url = URL.createObjectURL(blob);
+        
+        // Create download link
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'decoded_file' + (fileType ? '.' + fileType.split('/')[1] : '');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        showFileResult('File decoded and downloaded', 'Base64 Decoded File');
+      } catch (e) {
+        showError('Error decoding file - invalid Base64: ' + e.message);
+      }
+    }
+    
+    function showResult(result, type) {
+      resultBox.textContent = showEncodingType.checked ? `${type}:\n${result}` : result;
+      updateResultStats();
+      hideError();
+      
+      if (showEncodingType.checked) {
+        resultType.textContent = `Type: ${type}`;
+      } else {
+        resultType.textContent = `Type: ${type.split(' ')[0]}`;
+      }
+    }
+    
+    function showFileResult(result, type) {
+      fileResultBox.textContent = showEncodingType.checked ? `${type}:\n${result}` : result;
+      fileResultLength.textContent = `Length: ${result.length} characters`;
+      fileResultType.textContent = `Type: ${type}`;
+      fileResult.style.display = 'block';
+      hideError();
+    }
+    
+    function copyResult() {
+      if (!resultBox.textContent) {
+        showError('No result to copy.');
+        return;
+      }
+      
+      navigator.clipboard.writeText(resultBox.textContent)
+        .then(() => {
+          showCopyNotification();
+        })
+        .catch(err => {
+          showError('Failed to copy: ' + err);
+        });
+    }
+    
+    function copyFileResult() {
+      if (!fileResultBox.textContent) {
+        showError('No file result to copy.');
+        return;
+      }
+      
+      navigator.clipboard.writeText(fileResultBox.textContent)
+        .then(() => {
+          showCopyNotification();
+        })
+        .catch(err => {
+          showError('Failed to copy: ' + err);
+        });
+    }
+    
+    function downloadResult() {
+      if (!resultBox.textContent) {
+        showError('No result to download.');
+        return;
+      }
+      
+      let content = resultBox.textContent;
+      let extension = '.txt';
+      
+      // Remove the type prefix if showing encoding type
+      if (showEncodingType.checked) {
+        const firstNewline = content.indexOf('\n');
+        if (firstNewline !== -1) {
+          content = content.substring(firstNewline + 1);
+        }
+      }
+      
+      // Determine file type
+      if (content.startsWith('data:')) {
+        const matches = content.match(/^data:(.+?);base64,/);
+        if (matches && matches[1]) {
+          extension = '.' + matches[1].split('/')[1] || '.bin';
+        }
+      }
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'base64_result' + extension;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    function downloadFileResult() {
+      if (!fileResultBox.textContent) {
+        showError('No file result to download.');
+        return;
+      }
+      
+      let content = fileResultBox.textContent;
+      let extension = '.txt';
+      
+      // Remove the type prefix if showing encoding type
+      if (showEncodingType.checked) {
+        const firstNewline = content.indexOf('\n');
+        if (firstNewline !== -1) {
+          content = content.substring(firstNewline + 1);
+        }
+      }
+      
+      // Determine file type
+      if (content.startsWith('data:')) {
+        const matches = content.match(/^data:(.+?);base64,/);
+        if (matches && matches[1]) {
+          extension = '.' + matches[1].split('/')[1] || '.bin';
+        }
+      }
+      
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'base64_file' + extension;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+    
+    function swapInputOutput() {
+      if (!resultBox.textContent) {
+        showError('No result to swap.');
+        return;
+      }
+      
+      const currentInput = textInput.value;
+      let resultContent = resultBox.textContent;
+      
+      // Remove the type prefix if showing encoding type
+      if (showEncodingType.checked) {
+        const firstNewline = resultContent.indexOf('\n');
+        if (firstNewline !== -1) {
+          resultContent = resultContent.substring(firstNewline + 1);
+        }
+      }
+      
+      textInput.value = resultContent;
+      resultBox.textContent = currentInput;
+      
+      updateInputStats();
+      updateResultStats();
+    }
+    
+    function clearAll() {
+      textInput.value = '';
+      resultBox.textContent = '';
+      updateInputStats();
+      updateResultStats();
+      hideError();
+    }
+    
+    function clearFile() {
+      fileInput.value = '';
+      fileInfo.style.display = 'none';
+      fileResult.style.display = 'none';
+      previewContent.style.display = 'none';
+      currentFile = null;
+      currentFileType = '';
+      hideError();
+    }
+    
+    function showError(message) {
+      errorContainer.style.display = 'block';
+      errorMessage.textContent = message;
+    }
+    
+    function hideError() {
+      errorContainer.style.display = 'none';
+    }
+    
+    function showCopyNotification() {
+      copyNotification.classList.add('show');
+      setTimeout(() => {
+        copyNotification.classList.remove('show');
+      }, 2000);
+    }
+    
+    // Stats Functions
+    function updateInputStats() {
+      const text = textInput.value;
+      const lines = text.split('\n').length;
+      
+      inputLength.textContent = `Length: ${text.length} characters`;
+      inputLines.textContent = `Lines: ${lines}`;
+    }
+    
+    function updateResultStats() {
+      const text = resultBox.textContent;
+      const lines = text.split('\n').length;
+      
+      resultLength.textContent = `Length: ${text.length} characters`;
+      resultLines.textContent = `Lines: ${lines}`;
+    }
+    
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return `${bytes} B`;
+      if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
+      if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
+      return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+    }
+    
+    // Settings Functions
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode', darkMode.checked);
+      if (darkMode.checked) {
+        document.body.style.backgroundColor = '#1a1a1a';
+        document.body.style.color = '#f0f0f0';
+      } else {
+        document.body.style.backgroundColor = '#f5f5f5';
+        document.body.style.color = '#0a1128';
+      }
+      saveSettings();
+    }
+    
+    function toggleStatsVisibility() {
+      const statsElements = document.querySelectorAll('.stats');
+      statsElements.forEach(el => {
+        el.style.display = showStats.checked ? 'flex' : 'none';
+      });
+      saveSettings();
+    }
+    
+    function saveSettings() {
+      const settings = {
+        autoCopy: autoCopy.checked,
+        autoClear: autoClear.checked,
+        darkMode: darkMode.checked,
+        showStats: showStats.checked,
+        preserveLinebreaks: preserveLinebreaks.checked,
+        showEncodingType: showEncodingType.checked,
+        autoPreview: autoPreview.checked
+      };
+      
+      localStorage.setItem('base64Settings', JSON.stringify(settings));
+    }
+    
+    function loadSettings() {
+      const savedSettings = localStorage.getItem('base64Settings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        
+        autoCopy.checked = settings.autoCopy;
+        autoClear.checked = settings.autoClear;
+        darkMode.checked = settings.darkMode;
+        showStats.checked = settings.showStats;
+        preserveLinebreaks.checked = settings.preserveLinebreaks;
+        showEncodingType.checked = settings.showEncodingType;
+        autoPreview.checked = settings.autoPreview !== undefined ? settings.autoPreview : true;
+        
+        // Apply UI settings
+        toggleDarkMode();
+        toggleStatsVisibility();
       }
     }
   </script>
-
 </body>
 </html>
-
-  
-  
