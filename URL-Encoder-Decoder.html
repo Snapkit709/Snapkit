@@ -1,109 +1,798 @@
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>URL Encoder / Decoder</title>
+  <title>Advanced URL Encoder / Decoder</title>
   <style>
+    :root {
+      --primary: #4a6fa5;
+      --secondary: #166088;
+      --dark: #0a1128;
+      --light: #f5f5f5;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      background: #f5faff;
+      background-color: var(--light);
+      color: var(--dark);
+      line-height: 1.6;
       padding: 20px;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px 0;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    h1 {
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    
+    .description {
+      color: #666;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .tab-container {
+      margin-bottom: 20px;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      background-color: #eee;
+    }
+    
+    .tab.active {
+      background-color: white;
+      border-color: #ddd;
+      border-bottom-color: white;
+      margin-bottom: -1px;
+      font-weight: bold;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .input-area {
       display: flex;
       flex-direction: column;
-      align-items: center;
+      margin-bottom: 20px;
     }
-
-    h2 {
-      color: #007bff;
-      text-align: center;
-      margin-bottom: 15px;
-    }
-
+    
     .input-box {
-      width: 90%;
-      max-width: 600px;
-      min-height: 100px;
-      background: #ffffff;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 10px;
-      font-size: 16px;
-      margin-bottom: 15px;
-      white-space: pre-wrap;
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      resize: vertical;
+      background-color: #fafafa;
+    }
+    
+    .input-box:focus {
       outline: none;
-      overflow-y: auto;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(74, 111, 165, 0.2);
     }
-
+    
     .button-group {
-      margin-bottom: 15px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 20px;
     }
-
+    
     button {
-      background-color: #007bff;
+      background-color: var(--primary);
       color: white;
       border: none;
       padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 8px;
-      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    button:hover {
+      background-color: var(--secondary);
+      transform: translateY(-2px);
+    }
+    
+    button:active {
+      transform: translateY(0);
+    }
+    
+    button.secondary {
+      background-color: var(--info);
+    }
+    
+    button.success {
+      background-color: var(--success);
+    }
+    
+    button.warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+    
+    button.danger {
+      background-color: var(--danger);
+    }
+    
+    .result-area {
+      margin-top: 20px;
+    }
+    
+    .result-box {
+      width: 100%;
+      min-height: 120px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #e9f7ff;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .copy-notification {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: var(--success);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .copy-notification.show {
+      opacity: 1;
+    }
+    
+    .settings-panel {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .setting-option {
+      margin-bottom: 15px;
+    }
+    
+    .setting-option label {
+      display: flex;
+      align-items: center;
       cursor: pointer;
     }
-
-    button:hover {
-      background-color: #0056b3;
+    
+    .setting-option input[type="checkbox"] {
+      margin-right: 10px;
     }
-
-    #result {
-      width: 90%;
-      max-width: 600px;
-      background: #e9f7ff;
+    
+    .error-message {
+      color: var(--danger);
+      background-color: #fdecea;
       padding: 10px;
-      border-radius: 10px;
-      font-size: 16px;
-      word-break: break-all;
+      border-radius: 5px;
+      margin-top: 10px;
+      font-family: monospace;
       white-space: pre-wrap;
+    }
+    
+    @media (max-width: 600px) {
+      .button-group {
+        flex-direction: column;
+      }
+      
+      button {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
-
-  <h2>URL Encoder / Decoder</h2>
-
-  <div id="urlInput" class="input-box" contenteditable="true" placeholder="Enter text here..."></div>
-
-  <div class="button-group">
-    <button onclick="encodeURL()">Encode</button>
-    <button onclick="decodeURL()">Decode</button>
+  <div class="container">
+    <header>
+      <h1>Advanced URL Encoder/Decoder</h1>
+      <p class="description">
+        Encode and decode URLs with full URI and component options. 
+        Also includes Base64 encoding/decoding and URL analysis.
+      </p>
+    </header>
+    
+    <div class="tab-container">
+      <div class="tabs">
+        <div class="tab active" data-tab="encoder">Encoder/Decoder</div>
+        <div class="tab" data-tab="analyzer">URL Analyzer</div>
+        <div class="tab" data-tab="settings">Settings</div>
+      </div>
+    </div>
+    
+    <div class="tab-content active" id="encoder">
+      <div class="input-area">
+        <textarea id="urlInput" class="input-box" placeholder="Enter text or URL to encode/decode..."></textarea>
+        <div class="stats">
+          <span id="input-length">Length: 0 characters</span>
+          <span id="input-lines">Lines: 1</span>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="encodeFullURI()" title="Encode full URI (keeps :/?&= intact)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2h10v10M22 2L12 12M12 22H2V12"></path>
+          </svg>
+          Encode URI
+        </button>
+        <button onclick="encodeURIComponent()" class="secondary" title="Encode URI component (encodes all special chars)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2h10v10M22 2L12 12M12 22H2V12"></path>
+          </svg>
+          Encode Component
+        </button>
+        <button onclick="decodeFullURI()" title="Decode full URI">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12h20M12 2v20M22 12l-10 10L2 12"></path>
+          </svg>
+          Decode URI
+        </button>
+        <button onclick="decodeURIComponent()" class="secondary" title="Decode URI component">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12h20M12 2v20M22 12l-10 10L2 12"></path>
+          </svg>
+          Decode Component
+        </button>
+        <button onclick="encodeBase64()" class="success" title="Encode to Base64">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <path d="M12 8v8m-4-4h8"></path>
+          </svg>
+          Base64 Encode
+        </button>
+        <button onclick="decodeBase64()" class="warning" title="Decode from Base64">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <path d="M12 8v8m-4-4h8"></path>
+          </svg>
+          Base64 Decode
+        </button>
+        <button onclick="clearAll()" class="danger" title="Clear input and output">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Clear All
+        </button>
+      </div>
+      
+      <div class="result-area">
+        <div class="button-group">
+          <button onclick="copyResult()" title="Copy result to clipboard">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            Copy Result
+          </button>
+          <button onclick="swapInputOutput()" title="Swap input and output">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="17 1 21 5 17 9"></polyline>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"></path>
+              <polyline points="7 23 3 19 7 15"></polyline>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"></path>
+            </svg>
+            Swap
+          </button>
+        </div>
+        
+        <div id="result" class="result-box"></div>
+        <div class="stats">
+          <span id="result-length">Length: 0 characters</span>
+          <span id="result-lines">Lines: 0</span>
+          <span id="result-type">Type: None</span>
+        </div>
+      </div>
+      
+      <div id="error-container" style="display: none;">
+        <div class="error-message"></div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="analyzer">
+      <div class="input-area">
+        <textarea id="analyzerInput" class="input-box" placeholder="Enter URL to analyze..."></textarea>
+        <div class="stats">
+          <span id="analyzer-length">Length: 0 characters</span>
+        </div>
+      </div>
+      
+      <div class="button-group">
+        <button onclick="analyzeURL()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          Analyze URL
+        </button>
+        <button onclick="clearAnalyzer()" class="danger">
+          Clear
+        </button>
+      </div>
+      
+      <div id="analyzer-result" class="result-area" style="display: none;">
+        <h3>URL Analysis Results</h3>
+        <div id="url-parts" class="settings-panel"></div>
+      </div>
+    </div>
+    
+    <div class="tab-content" id="settings">
+      <div class="settings-panel">
+        <h3>Application Settings</h3>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="auto-copy" checked>
+            Auto-copy results to clipboard
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="auto-clear">
+            Auto-clear input after processing
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="dark-mode">
+            Dark mode
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="show-stats" checked>
+            Show statistics
+          </label>
+        </div>
+      </div>
+      
+      <div class="settings-panel">
+        <h3>Encoding Settings</h3>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="preserve-linebreaks" checked>
+            Preserve line breaks when possible
+          </label>
+        </div>
+        
+        <div class="setting-option">
+          <label>
+            <input type="checkbox" id="show-encoding-type" checked>
+            Show encoding type in results
+          </label>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div id="result"></div>
-
+  
+  <div class="copy-notification" id="copy-notification">
+    Copied to clipboard!
+  </div>
+  
   <script>
-    function encodeURL() {
-      const input = document.getElementById("urlInput").innerText.trim();
+    // DOM Elements
+    const urlInput = document.getElementById('urlInput');
+    const resultBox = document.getElementById('result');
+    const inputLength = document.getElementById('input-length');
+    const inputLines = document.getElementById('input-lines');
+    const resultLength = document.getElementById('result-length');
+    const resultLines = document.getElementById('result-lines');
+    const resultType = document.getElementById('result-type');
+    const errorContainer = document.getElementById('error-container');
+    const errorMessage = document.querySelector('.error-message');
+    const copyNotification = document.getElementById('copy-notification');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const analyzerInput = document.getElementById('analyzerInput');
+    const analyzerResult = document.getElementById('analyzer-result');
+    const urlParts = document.getElementById('url-parts');
+    
+    // Settings elements
+    const autoCopy = document.getElementById('auto-copy');
+    const autoClear = document.getElementById('auto-clear');
+    const darkMode = document.getElementById('dark-mode');
+    const showStats = document.getElementById('show-stats');
+    const preserveLinebreaks = document.getElementById('preserve-linebreaks');
+    const showEncodingType = document.getElementById('show-encoding-type');
+    
+    // Event Listeners
+    urlInput.addEventListener('input', updateInputStats);
+    analyzerInput.addEventListener('input', updateAnalyzerStats);
+    
+    // Tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(tabId).classList.add('active');
+      });
+    });
+    
+    // Settings change listeners
+    darkMode.addEventListener('change', toggleDarkMode);
+    showStats.addEventListener('change', toggleStatsVisibility);
+    
+    // Initialize
+    updateInputStats();
+    loadSettings();
+    
+    // Main Functions
+    function encodeFullURI() {
       try {
-        const encoded = encodeURIComponent(input);
-        document.getElementById("result").innerText = "Encoded URL:\n" + encoded;
+        const input = urlInput.value;
+        const encoded = encodeURI(input);
+        showResult(encoded, 'Encoded URI');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) urlInput.value = '';
       } catch (e) {
-        document.getElementById("result").innerText = "Error encoding URL.";
+        showError('Error encoding URI: ' + e.message);
       }
     }
-
-    function decodeURL() {
-      const input = document.getElementById("urlInput").innerText.trim();
+    
+    function encodeURIComponent() {
       try {
-        const decoded = decodeURIComponent(input);
-        document.getElementById("result").innerText = "Decoded URL:\n" + decoded;
+        const input = urlInput.value;
+        const encoded = encodeURIComponent(input);
+        showResult(encoded, 'Encoded URI Component');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) urlInput.value = '';
       } catch (e) {
-        document.getElementById("result").innerText = "Invalid encoded URL.";
+        showError('Error encoding URI component: ' + e.message);
+      }
+    }
+    
+    function decodeFullURI() {
+      try {
+        const input = urlInput.value;
+        const decoded = decodeURI(input);
+        showResult(decoded, 'Decoded URI');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) urlInput.value = '';
+      } catch (e) {
+        showError('Error decoding URI: ' + e.message);
+      }
+    }
+    
+    function decodeURIComponent() {
+      try {
+        const input = urlInput.value;
+        const decoded = decodeURIComponent(input);
+        showResult(decoded, 'Decoded URI Component');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) urlInput.value = '';
+      } catch (e) {
+        showError('Error decoding URI component: ' + e.message);
+      }
+    }
+    
+    function encodeBase64() {
+      try {
+        const input = urlInput.value;
+        const encoded = btoa(unescape(encodeURIComponent(input)));
+        showResult(encoded, 'Base64 Encoded');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) urlInput.value = '';
+      } catch (e) {
+        showError('Error encoding to Base64: ' + e.message);
+      }
+    }
+    
+    function decodeBase64() {
+      try {
+        const input = urlInput.value;
+        const decoded = decodeURIComponent(escape(atob(input)));
+        showResult(decoded, 'Base64 Decoded');
+        
+        if (autoCopy.checked) copyResult();
+        if (autoClear.checked) urlInput.value = '';
+      } catch (e) {
+        showError('Error decoding from Base64: ' + e.message);
+      }
+    }
+    
+    function analyzeURL() {
+      try {
+        const input = analyzerInput.value.trim();
+        if (!input) {
+          showError('Please enter a URL to analyze.');
+          return;
+        }
+        
+        let url;
+        try {
+          // Try to parse as-is first
+          url = new URL(input);
+        } catch (e) {
+          // If that fails, try adding http:// prefix
+          if (!input.startsWith('http://') && !input.startsWith('https://')) {
+            url = new URL('http://' + input);
+          } else {
+            throw e;
+          }
+        }
+        
+        const parts = {
+          'Full URL': url.href,
+          'Protocol': url.protocol,
+          'Hostname': url.hostname,
+          'Port': url.port || '80 (default)',
+          'Path': url.pathname,
+          'Query String': url.search,
+          'Hash/Fragment': url.hash,
+          'Username': url.username || '(none)',
+          'Password': url.password ? '••••••' : '(none)',
+          'Origin': url.origin
+        };
+        
+        let html = '';
+        for (const [key, value] of Object.entries(parts)) {
+          html += `<div class="setting-option">
+            <label style="align-items: flex-start;">
+              <strong>${key}:</strong>
+              <span style="margin-left: 10px; word-break: break-all;">${value || '(empty)'}</span>
+            </label>
+          </div>`;
+        }
+        
+        // Parse query parameters if they exist
+        if (url.search) {
+          const params = url.searchParams;
+          if (params.toString()) {
+            html += `<div class="setting-option">
+              <label style="align-items: flex-start;">
+                <strong>Query Parameters:</strong>
+              </label>
+            </div>`;
+            
+            params.forEach((value, key) => {
+              html += `<div class="setting-option" style="margin-left: 20px;">
+                <label style="align-items: flex-start;">
+                  <span>${key}:</span>
+                  <span style="margin-left: 10px; word-break: break-all;">${value || '(empty)'}</span>
+                </label>
+              </div>`;
+            });
+          }
+        }
+        
+        urlParts.innerHTML = html;
+        analyzerResult.style.display = 'block';
+      } catch (e) {
+        showError('Invalid URL: ' + e.message);
+      }
+    }
+    
+    function showResult(result, type) {
+      resultBox.textContent = showEncodingType.checked ? `${type}:\n${result}` : result;
+      updateResultStats();
+      hideError();
+      
+      if (showEncodingType.checked) {
+        resultType.textContent = `Type: ${type}`;
+      } else {
+        resultType.textContent = `Type: ${type.split(' ')[0]}`;
+      }
+    }
+    
+    function copyResult() {
+      if (!resultBox.textContent) {
+        showError('No result to copy.');
+        return;
+      }
+      
+      navigator.clipboard.writeText(resultBox.textContent)
+        .then(() => {
+          showCopyNotification();
+        })
+        .catch(err => {
+          showError('Failed to copy: ' + err);
+        });
+    }
+    
+    function swapInputOutput() {
+      if (!resultBox.textContent) {
+        showError('No result to swap.');
+        return;
+      }
+      
+      const currentInput = urlInput.value;
+      let resultContent = resultBox.textContent;
+      
+      // Remove the type prefix if showing encoding type
+      if (showEncodingType.checked) {
+        const firstNewline = resultContent.indexOf('\n');
+        if (firstNewline !== -1) {
+          resultContent = resultContent.substring(firstNewline + 1);
+        }
+      }
+      
+      urlInput.value = resultContent;
+      resultBox.textContent = currentInput;
+      
+      updateInputStats();
+      updateResultStats();
+    }
+    
+    function clearAll() {
+      urlInput.value = '';
+      resultBox.textContent = '';
+      updateInputStats();
+      updateResultStats();
+      hideError();
+    }
+    
+    function clearAnalyzer() {
+      analyzerInput.value = '';
+      analyzerResult.style.display = 'none';
+      updateAnalyzerStats();
+      hideError();
+    }
+    
+    function showError(message) {
+      errorContainer.style.display = 'block';
+      errorMessage.textContent = message;
+    }
+    
+    function hideError() {
+      errorContainer.style.display = 'none';
+    }
+    
+    function showCopyNotification() {
+      copyNotification.classList.add('show');
+      setTimeout(() => {
+        copyNotification.classList.remove('show');
+      }, 2000);
+    }
+    
+    // Stats Functions
+    function updateInputStats() {
+      const text = urlInput.value;
+      const lines = text.split('\n').length;
+      
+      inputLength.textContent = `Length: ${text.length} characters`;
+      inputLines.textContent = `Lines: ${lines}`;
+    }
+    
+    function updateResultStats() {
+      const text = resultBox.textContent;
+      const lines = text.split('\n').length;
+      
+      resultLength.textContent = `Length: ${text.length} characters`;
+      resultLines.textContent = `Lines: ${lines}`;
+    }
+    
+    function updateAnalyzerStats() {
+      const text = analyzerInput.value;
+      analyzerLength.textContent = `Length: ${text.length} characters`;
+    }
+    
+    // Settings Functions
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode', darkMode.checked);
+      if (darkMode.checked) {
+        document.body.style.backgroundColor = '#1a1a1a';
+        document.body.style.color = '#f0f0f0';
+      } else {
+        document.body.style.backgroundColor = '#f5faff';
+        document.body.style.color = '#0a1128';
+      }
+      saveSettings();
+    }
+    
+    function toggleStatsVisibility() {
+      const statsElements = document.querySelectorAll('.stats');
+      statsElements.forEach(el => {
+        el.style.display = showStats.checked ? 'flex' : 'none';
+      });
+      saveSettings();
+    }
+    
+    function saveSettings() {
+      const settings = {
+        autoCopy: autoCopy.checked,
+        autoClear: autoClear.checked,
+        darkMode: darkMode.checked,
+        showStats: showStats.checked,
+        preserveLinebreaks: preserveLinebreaks.checked,
+        showEncodingType: showEncodingType.checked
+      };
+      
+      localStorage.setItem('urlEncoderSettings', JSON.stringify(settings));
+    }
+    
+    function loadSettings() {
+      const savedSettings = localStorage.getItem('urlEncoderSettings');
+      if (savedSettings) {
+        const settings = JSON.parse(savedSettings);
+        
+        autoCopy.checked = settings.autoCopy;
+        autoClear.checked = settings.autoClear;
+        darkMode.checked = settings.darkMode;
+        showStats.checked = settings.showStats;
+        preserveLinebreaks.checked = settings.preserveLinebreaks;
+        showEncodingType.checked = settings.showEncodingType;
+        
+        // Apply UI settings
+        toggleDarkMode();
+        toggleStatsVisibility();
       }
     }
   </script>
-
 </body>
 </html>
-
-  
-  
